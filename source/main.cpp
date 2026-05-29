@@ -126,6 +126,49 @@ class Lexer{
                 return Token{TokenType::DOT, "."};
                 break;
             
+            case '>':
+                if(text[pos+1] == '>'){
+                    std::cout << "Got right arrow token\n";
+                    pos += 2;
+                    return Token{TokenType::RIGHT_ARROW, ">>"};
+                }
+                break;
+            case '|':
+                std::cout << "Got pipe token\n";
+                pos++;
+                return Token{TokenType::PIPE, "|"};
+                break;
+            
+            case '=':
+                std::cout << "Got equals token\n";
+                pos++;
+                return Token{TokenType::EQUALS, "="};
+                break;
+            case '+':
+                std::cout << "Got plus token\n";
+                pos++;
+                return Token{TokenType::PLUS, "+"};
+                break;
+            case '-':
+                std::cout << "Got minus token\n";
+                pos++;
+                return Token{TokenType::MINUS, "-"};
+                break;
+            case '*':
+                std::cout << "Got star token\n";
+                pos++;
+                return Token{TokenType::STAR, "*"};
+                break;
+            case '/':
+                std::cout << "Got slash token\n";
+                pos++;
+                return Token{TokenType::SLASH, "/"};
+                break;
+            case '&':
+                std::cout << "Got ampersand token\n";
+                pos++;
+                return Token{TokenType::AMPERSAND, "&"};
+                break;
             default:
                 if((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z')){
                     while ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9')){
@@ -164,7 +207,7 @@ class Lexer{
 Lexer lexer;
 
 int main(){
-    std::string example = "Entity[Position, Model] Player;";
+    std::string example = "Entity[Position, Model] Player; >> >";
     lexer.text = example;
     std::vector<Token> tokenList;
     Token t;
