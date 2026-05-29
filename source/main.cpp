@@ -66,7 +66,6 @@ class Lexer{
             return Token{TokenType::END_OF_FILE, ""};
         }
         std::string literal = "";
-        // checking against literals
         
         // switch statement for punctuation
         switch(character){
@@ -171,8 +170,9 @@ class Lexer{
                 return Token{TokenType::AMPERSAND, "&"};
                 break;
             default:
+            // checking against literals
                 if((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z')){
-                    while ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9')){
+                    while ( (pos < text.length()) && ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9') || (character == '_'))){
                         literal += character;
                         pos++;
                         character = forward();
