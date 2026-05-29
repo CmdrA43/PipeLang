@@ -64,8 +64,7 @@ class Lexer{
     
     public:
     void skipWhitespace() {
-        while (pos < text.length() && (text[pos] == ' ' || text[pos] == '\n'))
-            ++pos;
+        while (pos < text.length() && (text[pos] == ' ' || text[pos] == '\n'|| text[pos] == '\t' || text[pos] == '\r')) ++pos;
     }
     
     Token getToken(){
@@ -149,15 +148,27 @@ class Lexer{
             // string literal handling
             case '"':
                 std::cout << "Got string literal\n";
-                pos++;
-                while(text[pos] != '"'){
-                    if(text[pos+1] == '"'){
-                        pos += 2;
-                        literal += '"';
-                        continue;
+                pos++; // skip opening quote
+                literal.clear();
+                while (pos < text.length() && text[pos] != '"') {
+                    if (text[pos] == '\\' && pos + 1 < text.length()) {
+                        // simple escape handling
+                        switch (text[pos + 1]) {
+                            case '"':  literal += '"';  pos += 2; break;
+                            case '\\': literal += '\\'; pos += 2; break;
+                            case 'n':  literal += '\n'; pos += 2; break;
+                            // add other escapes as needed
+                            default:   literal += text[pos]; pos++; break;
+                        }
+                    } else {
+                        literal += text[pos];
+                        pos++;
                     }
-                    literal += text[pos];
-                    ++pos;
+                }
+                if (pos < text.length()) {
+                    pos++; // skip closing quote
+                } else {
+                    std::cout << "Warning: unterminated string literal\n";
                 }
                 return Token{TokenType::STRING, literal};
                 break;
@@ -243,7 +254,7 @@ class Lexer{
                     }
                 }
                 // check if number
-                if(std::isdigit(text[pos]) || (text[pos] == '-')){
+                if(std::isdigit(text[pos])){
                     std::string literal;
                     while(std::isdigit(text[pos]) || text[pos] == '.'){
                         literal += text[pos];
@@ -258,7 +269,7 @@ class Lexer{
         // when all else fails, throw an error
         std::cout << "Unrecognized character: \"" << text[pos] << "\" at pos " << pos << std::endl;
         pos++;
-        return Token{TokenType::ERROR, std::to_string(text[pos])};
+        return Token{TokenType::ERROR, std::string(1, text[pos])};
     };
 };
 
@@ -267,16 +278,16 @@ Lexer lexer;
 // --- PARSER ---
 
 int main(){
-    std::ifstream file("example1.txt");
+    std::ifstream file("../tests/example1.txt");
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string content = buffer.str();
     lexer.text = content;
     std::vector<Token> tokenList;
-    Token t;
+    Token t = lexer.getToken;
     while(t.type != TokenType::END_OF_FILE){
-        t = lexer.getToken();
         tokenList.push_back(t);
+        t = lexer.getToken();
     }
 
     return 0;

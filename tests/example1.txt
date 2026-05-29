@@ -1,17 +1,19 @@
-Component Position{
-    i32 x;
-    i32 y;
-    i32 z;
-};
+Component Position { x: f32; y: f32; };
+Component Velocity { dx: f32; dy: f32; };
 
-Entity enemy;
-enemy.addComponent(Position);
+entity Particle = { Position, Velocity };
 
-System physics(edit Position, edit Velocity, edit Acceleration){
-    Acceleration = net_forces;
-    Velocity += Acceleration*dt;
-    Position += velocity;
-};
+IO io.framebuffer: i32;   // memory-mapped framebuffer address
 
-Pipeline:
-{{input_handler | AI} >> physics >> {sound | check_objs} >> push_frame};
+threaded system integrate(edit Position, edit Velocity) {
+    let dt: f32 = 0.016;
+    Position.x += Velocity.dx * dt;
+    Position.y += Velocity.dy * dt;
+}
+
+system render(read Position, read io.framebuffer) {
+    draw_pixel(Position.x, Position.y, io.framebuffer);
+}
+
+Pipeline main_pipe:
+    integrate >> render;
