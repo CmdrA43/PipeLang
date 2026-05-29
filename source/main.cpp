@@ -65,68 +65,91 @@ class Lexer{
         }
         std::string literal = "";
         // checking against literals
-        if((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z')){
-            while ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9')){
-                literal += character;
-                pos++;
-                character = forward();
-            }
-            if(literal == "Entity"){
-                std::cout << "Got Entity token\n";
-                return Token{TokenType::ENTITY, literal};
-            }
-            else if(literal == "Component"){
-                std::cout << "Got Component token\n";
-                return Token{TokenType::COMPONENT, literal};
-            }
-            else if(literal == "System"){
-                std::cout << "Got System token\n";
-                return Token{TokenType::SYSTEM, literal};
-            }
-            // return as an identifier
-            else{
-                std::cout << "Got identifier token: \"" << literal << "\"\n";
-                return Token{TokenType::IDENT, literal};
-            }
-        }
+        
         // switch statement for punctuation
         switch(character){
             case '(':
+                std::cout << "Got left parenthesis token\n";
+                pos++;
                 return Token{TokenType::LPAREN, "("};
                 break;
             case ')':
+                std::cout << "Got right parenthesis token\n";
+                pos++;
                 return Token{TokenType::RPAREN, "("};
                 break;
             case '{':
+                std::cout << "Got left brace token\n";
+                pos++;
                 return Token{TokenType::LBRACE, "{"};
                 break;
             case '}':
+                std::cout << "Got right brace token\n";
+                pos++;
                 return Token{TokenType::RBRACE, "}"};
                 break;
             case '[':
+                std::cout << "Got left bracket token\n";
+                pos++;
                 return Token{TokenType::LBRACKET, "["};
                 break;
             case ']':
+                std::cout << "Got right bracket token\n";
+                pos++;
                 return Token{TokenType::RBRACKET, "]"};
                 break;
             case '"':
+                std::cout << "Got quotation token\n";
+                pos++;
                 return Token{TokenType::QUOTATION, "\""};
                 break;
                 
             case ',':
+                std::cout << "Got comma token\n";
+                pos++;
                 return Token{TokenType::COMMA, ","};
                 break;
             case ';':
+                std::cout << "Got semicolon token\n";
+                pos++;
                 return Token{TokenType::SEMICOLON, ";"};
                 break;
             case ':':
+                std::cout << "Got colon token\n";
+                pos++;
                 return Token{TokenType::COLON, ":"};
                 break;
             case '.':
+                std::cout << "Got dot token\n";
+                pos++;
                 return Token{TokenType::DOT, "."};
                 break;
             
             default:
+                if((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z')){
+                    while ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9')){
+                        literal += character;
+                        pos++;
+                        character = forward();
+                    }
+                    if(literal == "Entity"){
+                        std::cout << "Got Entity token\n";
+                        return Token{TokenType::ENTITY, literal};
+                    }
+                    else if(literal == "Component"){
+                        std::cout << "Got Component token\n";
+                        return Token{TokenType::COMPONENT, literal};
+                    }
+                    else if(literal == "System"){
+                        std::cout << "Got System token\n";
+                        return Token{TokenType::SYSTEM, literal};
+                    }
+                    // return as an identifier
+                    else{
+                        std::cout << "Got identifier token: \"" << literal << "\"\n";
+                        return Token{TokenType::IDENT, literal};
+                    }
+                }
             break;
         };
         
