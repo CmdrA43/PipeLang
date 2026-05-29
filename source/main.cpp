@@ -3,6 +3,8 @@
 #include <sstream>
 #include <vector>
 
+// --- LEXER ---
+
 enum class TokenType{
     // reserved keywords
     ENTITY,
@@ -218,6 +220,8 @@ class Lexer{
 };
 
 Lexer lexer;
+
+// --- PARSER ---
 
 int main(){
     std::ifstream file("../tests/example1.txt");
