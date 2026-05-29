@@ -204,7 +204,7 @@ class Lexer{
 Lexer lexer;
 
 int main(){
-    std::ifstream file("tests/example1.txt");
+    std::ifstream file("../tests/example1.txt");
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string content = buffer.str();
