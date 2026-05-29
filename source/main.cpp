@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
 
 enum class TokenType{
@@ -207,8 +208,11 @@ class Lexer{
 Lexer lexer;
 
 int main(){
-    std::string example = "Entity[Position, Model] Player; >> >";
-    lexer.text = example;
+    std::ifstream file("example.txt");
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    std::string content = buffer.str();
+    lexer.text = content;
     std::vector<Token> tokenList;
     Token t;
     while(t.type != TokenType::END_OF_FILE){
