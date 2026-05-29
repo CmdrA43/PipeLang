@@ -14,4 +14,4 @@ System physics(edit Position, edit Velocity, edit Acceleration){
 };
 
 Pipeline:
-{input >> physics >> push_frame};
+{{input_handler | AI} >> physics >> {sound | check_objs} >> push_frame};
