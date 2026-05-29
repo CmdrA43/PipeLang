@@ -45,6 +45,7 @@ enum class TokenType{
     STAR,
     SLASH,
     AMPERSAND,
+    LET,
     // special
     END_OF_FILE,
     IDENT,
@@ -230,6 +231,10 @@ class Lexer{
                     else if(literal == "else"){
                         std::cout << "Got else token\n";
                         return Token{TokenType::ELSE, literal};
+                    }
+                    else if(literal == "let"){
+                        std::cout << "Got let token\n";
+                        return Token{TokenType::LET, literal};
                     }
                     // return as an identifier
                     else{
