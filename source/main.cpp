@@ -24,7 +24,6 @@ enum class TokenType{
     RBRACE,
     LBRACKET,
     RBRACKET,
-    QUOTATION,
     // delimiter symbols
     COMMA,
     SEMICOLON,
@@ -33,6 +32,12 @@ enum class TokenType{
     // pipeline symbols
     RIGHT_ARROW,
     PIPE,
+    // control flow
+    IF,
+    ELSE,
+    // literals
+    NUMBER,
+    STRING,
     // other
     EQUALS,
     PLUS,
@@ -68,9 +73,11 @@ class Lexer{
             std::cout << "Reached end of file\n";
             return Token{TokenType::END_OF_FILE, ""};
         }
+        std::string literal;
         
         // switch statement for punctuation
         switch(text[pos]){
+            // groupers
             case '(':
                 std::cout << "Got left parenthesis token\n";
                 pos++;
@@ -101,12 +108,8 @@ class Lexer{
                 pos++;
                 return Token{TokenType::RBRACKET, "]"};
                 break;
-            case '"':
-                std::cout << "Got quotation token\n";
-                pos++;
-                return Token{TokenType::QUOTATION, "\""};
-                break;
-                
+
+            // delimiters
             case ',':
                 std::cout << "Got comma token\n";
                 pos++;
@@ -127,7 +130,8 @@ class Lexer{
                 pos++;
                 return Token{TokenType::DOT, "."};
                 break;
-            
+
+            // pipe specials
             case '>':
                 if(text[pos+1] == '>'){
                     std::cout << "Got right arrow token\n";
@@ -140,7 +144,24 @@ class Lexer{
                 pos++;
                 return Token{TokenType::PIPE, "|"};
                 break;
+
+            // string literal handling
+            case '"':
+                std::cout << "Got string literal\n";
+                pos++;
+                while(text[pos] != '"'){
+                    if(text[pos+1] == '"'){
+                        pos += 2;
+                        literal += '"';
+                        continue;
+                    }
+                    literal += text[pos];
+                    ++pos;
+                }
+                return Token{TokenType::STRING, literal};
+                break;
             
+            // arithmetic/logic
             case '=':
                 std::cout << "Got equals token\n";
                 pos++;
@@ -172,9 +193,8 @@ class Lexer{
                 return Token{TokenType::AMPERSAND, "&"};
                 break;
             default:
-            // checking against literals
+            // checking against identifiers
                 if(std::isalpha(text[pos]) || text[pos] == '_'){
-                    std::string literal;
                     while ((pos < text.length()) && (std::isalnum(text[pos]) || text[pos] == '_')){
                         literal += text[pos];
                         ++pos;
@@ -203,11 +223,29 @@ class Lexer{
                         std::cout << "Got edit token\n";
                         return Token{TokenType::EDIT_PRIV, literal};
                     }
+                    else if(literal == "if"){
+                        std::cout << "Got if token\n";
+                        return Token{TokenType::IF, literal};
+                    }
+                    else if(literal == "else"){
+                        std::cout << "Got else token\n";
+                        return Token{TokenType::ELSE, literal};
+                    }
                     // return as an identifier
                     else{
                         std::cout << "Got identifier token: \"" << literal << "\"\n";
                         return Token{TokenType::IDENT, literal};
                     }
+                }
+                // check if number
+                if(std::isdigit(text[pos]) || (text[pos] == '-')){
+                    std::string literal;
+                    while(std::isdigit(text[pos]) || text[pos] == '.'){
+                        literal += text[pos];
+                        ++pos;
+                    }
+                    std::cout << "Got number literal\n";
+                    return Token{TokenType::NUMBER, literal};
                 }
             break;
         };
@@ -224,7 +262,7 @@ Lexer lexer;
 // --- PARSER ---
 
 int main(){
-    std::ifstream file("../tests/example1.txt");
+    std::ifstream file("example1.txt");
     std::stringstream buffer;
     buffer << file.rdbuf();
     std::string content = buffer.str();
