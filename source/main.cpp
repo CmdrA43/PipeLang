@@ -51,24 +51,20 @@ class Lexer{
     std::string text;
     
     public:
-    char forward(){
-        if(text[pos] == ' ' || text[pos] == '\n'){
-            pos++;
-            return forward();
-        }
-        return text[pos];
-    };
+    void skipWhitespace() {
+        while (pos < text.length() && (text[pos] == ' ' || text[pos] == '\n'))
+            ++pos;
+    }
     
     Token getToken(){
-        char character = forward();
-        if(character == '\0'){
+        skipWhitespace();
+        if(text[pos] == '\0'){
             std::cout << "Reached end of file\n";
             return Token{TokenType::END_OF_FILE, ""};
         }
-        std::string literal = "";
         
         // switch statement for punctuation
-        switch(character){
+        switch(text[pos]){
             case '(':
                 std::cout << "Got left parenthesis token\n";
                 pos++;
@@ -171,11 +167,11 @@ class Lexer{
                 break;
             default:
             // checking against literals
-                if((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z')){
-                    while ( (pos < text.length()) && ((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z') || (character >= '0' && character <= '9') || (character == '_'))){
-                        literal += character;
-                        pos++;
-                        character = forward();
+                if(std::isalpha(text[pos]) || text[pos] == '_'){
+                    std::string literal;
+                    while ((pos < text.length()) && (std::isalnum(text[pos]) || text[pos] == '_')){
+                        literal += text[pos];
+                        ++pos;
                     }
                     if(literal == "Entity"){
                         std::cout << "Got Entity token\n";
@@ -199,9 +195,9 @@ class Lexer{
         };
         
         // when all else fails, throw an error
-        std::cout << "Unrecognized character: \"" << character << "\" at pos " << pos << std::endl;
+        std::cout << "Unrecognized character: \"" << text[pos] << "\" at pos " << pos << std::endl;
         pos++;
-        return Token{TokenType::ERROR, std::to_string(character)};
+        return Token{TokenType::ERROR, std::to_string(text[pos])};
     };
 };
 
