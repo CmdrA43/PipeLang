@@ -11,6 +11,10 @@ enum class TokenType{
     IO,
     THREADED,
     FUSE,
+    // system priviliges
+    READ_PRIV,
+    WRITE_PRIV,
+    EDIT_PRIV,
     // grouping symbols
     LPAREN,
     RPAREN,
@@ -184,6 +188,18 @@ class Lexer{
                     else if(literal == "System"){
                         std::cout << "Got System token\n";
                         return Token{TokenType::SYSTEM, literal};
+                    }
+                    else if(literal == "read"){
+                        std::cout << "Got read token\n";
+                        return Token{TokenType::READ_PRIV, literal};
+                    }
+                    else if(literal == "write"){
+                        std::cout << "Got write token\n";
+                        return Token{TokenType::WRITE_PRIV, literal};
+                    }
+                    else if(literal == "edit"){
+                        std::cout << "Got edit token\n";
+                        return Token{TokenType::EDIT_PRIV, literal};
                     }
                     // return as an identifier
                     else{
