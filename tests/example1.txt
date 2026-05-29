@@ -1,0 +1,17 @@
+Component Position{
+    i32 x;
+    i32 y;
+    i32 z;
+};
+
+Entity enemy;
+enemy.addComponent(Position);
+
+System physics(edit Position, edit Velocity, edit Acceleration){
+    Acceleration = net_forces;
+    Velocity += Acceleration*dt;
+    Position += velocity;
+};
+
+Pipeline:
+{input >> physics >> push_frame};
