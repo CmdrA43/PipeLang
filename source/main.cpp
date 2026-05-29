@@ -61,6 +61,7 @@ class Lexer{
     Token getToken(){
         char character = forward();
         if(character == '\0'){
+            std::cout << "Reached end of file\n";
             return Token{TokenType::END_OF_FILE, ""};
         }
         std::string literal = "";
