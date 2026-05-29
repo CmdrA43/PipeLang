@@ -60,6 +60,9 @@ class Lexer{
     
     Token getToken(){
         char character = forward();
+        if(character == '\0'){
+            return Token{TokenType::END_OF_FILE, ""};
+        }
         std::string literal = "";
         // checking against literals
         if((character >= 'a' && character <= 'z') || (character >= 'A' && character <= 'Z')){
@@ -87,6 +90,45 @@ class Lexer{
             }
         }
         // switch statement for punctuation
+        switch(character){
+            case '(':
+                return Token{TokenType::LPAREN, "("};
+                break;
+            case ')':
+                return Token{TokenType::RPAREN, "("};
+                break;
+            case '{':
+                return Token{TokenType::LBRACE, "{"};
+                break;
+            case '}':
+                return Token{TokenType::RBRACE, "}"};
+                break;
+            case '[':
+                return Token{TokenType::LBRACKET, "["};
+                break;
+            case ']':
+                return Token{TokenType::RBRACKET, "]"};
+                break;
+            case '"':
+                return Token{TokenType::QUOTATION, "\""};
+                break;
+                
+            case ',':
+                return Token{TokenType::COMMA, ","};
+                break;
+            case ';':
+                return Token{TokenType::SEMICOLON, ";"};
+                break;
+            case ':':
+                return Token{TokenType::COLON, ":"};
+                break;
+            case '.':
+                return Token{TokenType::DOT, "."};
+                break;
+            
+            default:
+            break;
+        };
         
         // when all else fails, throw an error
         std::cout << "Unrecognized character: \"" << character << "\" at pos " << pos << std::endl;
@@ -98,12 +140,14 @@ class Lexer{
 Lexer lexer;
 
 int main(){
-    std::string example = "Entity<Position, Model> Player;";
+    std::string example = "Entity[Position, Model] Player;";
     lexer.text = example;
-    lexer.getToken();
-    lexer.getToken();
-    lexer.getToken();
-    lexer.getToken();
+    std::vector<Token> tokenList;
+    Token t;
+    while(t.type != TokenType::END_OF_FILE){
+        t = lexer.getToken();
+        tokenList.push_back(t);
+    }
 
     return 0;
 }
