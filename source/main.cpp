@@ -13,6 +13,7 @@ enum class TokenType{
     IO,
     THREADED,
     FUSE,
+    PIPELINE,
     // system priviliges
     READ_PRIV,
     WRITE_PRIV,
@@ -223,6 +224,10 @@ class Lexer{
                         std::cout << "Got System token\n";
                         return Token{TokenType::SYSTEM, literal};
                     }
+                    else if(literal == "Pipeline"){
+                        std::cout << "Got Pipeline token\n";
+                        return Token{TokenType::PIPELINE, literal};
+                    }
                     else if(literal == "read"){
                         std::cout << "Got read token\n";
                         return Token{TokenType::READ_PRIV, literal};
@@ -277,18 +282,240 @@ Lexer lexer;
 
 // --- PARSER ---
 
+class Parser{
+    public:
+    std::vector<Token> tokens;
+    size_t pos = 0;
+    
+    Token peek(){
+        if(pos < tokens.size()) return tokens[pos];
+        return Token{TokenType::END_OF_FILE, ""};
+    };
+    
+    Token advance(){
+        if (pos < tokens.size()) return tokens[pos++];
+        return Token{TokenType::END_OF_FILE, ""};
+    };
+    
+    Token expect(TokenType type, const std::string& context = ""){
+        Token t = peek();
+        if(t.type != type){
+            std::cerr << "Parse error at token " << pos
+                      << ": expected " << tokenTypeName(type)
+                      << " but got " << tokenTypeName(t.type)
+                      << " (" << t.value << ")"
+                      << (context.empty() ? "" : " in " + context)
+                      << std::endl;
+            exit(1);
+        };
+        return advance();
+    };
+    
+    bool check(TokenType type){
+        return peek().type == type;
+    };
+    
+    bool match(TokenType type){
+        if(check(type)){
+            advance();
+            return true;
+        }
+        return false;
+    };
+    
+    // recursion parsing
+    
+    void parseProgram(){
+        while(!check(TokenType::PIPELINE) && !check(TokenType::END_OF_FILE)){
+            parseDeclaration();
+        }
+        if(check(TokenType::PIPELINE)){
+            //parsePipeline();
+        }
+        expect(TokenType::END_OF_FILE, "end of file");
+    };
+    
+    void parseDeclaration(){
+        switch(peek().type){
+            case TokenType::COMPONENT: parseComponent(); break;
+            //case TokenType::ENTITY: parseEntity(); break;
+            //case TokenType::SYSTEM: parseSystem(); break;
+            //case TokenType::THREADED: parseSystem(); break;
+            //case TokenType::IO: parseIO(); break;
+            default:
+                std::cerr << "Unexpected token " << tokenTypeName(peek().type) << " at start of declaration\n";
+                exit(1);
+        }
+    };
+    
+    void parseComponent(){
+        expect(TokenType::COMPONENT, "component");
+        Token name = expect(TokenType::IDENT, "component name");
+        expect(TokenType::LBRACE, "component body");
+        
+        std::cout << "Component: " << name.value << "\n";
+        // parse fields until closing brace
+        while (!check(TokenType::RBRACE)) {
+            Token fieldName = expect(TokenType::IDENT, "field name");
+            expect(TokenType::COLON, "field type colon");
+            Token fieldType = expect(TokenType::IDENT, "field type");
+            expect(TokenType::SEMICOLON, "after field");
+            std::cout << "  field " << fieldName.value << " : " << fieldType.value << "\n";
+        }
+        
+        expect(TokenType::RBRACE, "end of component");
+        expect(TokenType::SEMICOLON, "after component");
+    };
+    
+    void parseEntity(){
+        
+    };
+    
+    private:
+    std::string tokenTypeName(TokenType type){
+        switch(type){
+            case TokenType::ENTITY:
+                return "entity";
+                break;
+            case TokenType::COMPONENT:
+                return "component";
+                break;
+            case TokenType::SYSTEM:
+                return "system";
+                break;
+            case TokenType::IO:
+                return "IO";
+                break;
+            case TokenType::THREADED:
+                return "threaded";
+                break;
+            case TokenType::FUSE:
+                return "fuse";
+                break;
+            case TokenType::PIPELINE:
+                return "pipeline";
+                break;
+                
+            case TokenType::READ_PRIV:
+                return "read";
+                break;
+            case TokenType::WRITE_PRIV:
+                return "write";
+                break;
+            case TokenType::EDIT_PRIV:
+                return "edit";
+                break;
+                
+            case TokenType::LPAREN:
+                return "(";
+                break;
+            case TokenType::RPAREN:
+                return ")";
+                break;
+            case TokenType::LBRACE:
+                return "{";
+                break;
+            case TokenType::RBRACE:
+                return "}";
+                break;
+            case TokenType::LBRACKET:
+                return "[";
+                break;
+            case TokenType::RBRACKET:
+                return "]";
+                break;
+                
+            case TokenType::COMMA:
+                return ",";
+                break;
+            case TokenType::SEMICOLON:
+                return ";";
+                break;
+            case TokenType::COLON:
+                return ":";
+                break;
+            case TokenType::DOT:
+                return ".";
+                break;
+                
+            case TokenType::RIGHT_ARROW:
+                return ">>";
+                break;
+            case TokenType::PIPE:
+                return "|";
+                break;
+                
+            case TokenType::IF:
+                return "if";
+                break;
+            case TokenType::ELSE:
+                return "else";
+                break;
+                
+            case TokenType::NUMBER:
+                return "number";
+                break;
+            case TokenType::STRING:
+                return "string";
+                break;
+                
+            case TokenType::EQUALS:
+                return "=";
+                break;
+            case TokenType::PLUS:
+                return "+";
+                break;
+            case TokenType::MINUS:
+                return "-";
+                break;
+            case TokenType::STAR:
+                return "*";
+                break;
+            case TokenType::SLASH:
+                return "/";
+                break;
+            case TokenType::AMPERSAND:
+                return "&";
+                break;
+            case TokenType::LET:
+                return "let";
+                break;
+                
+            case TokenType::END_OF_FILE:
+                return "end of file";
+                break;
+            case TokenType::IDENT:
+                return "identifier";
+                break;
+            case TokenType::ERROR:
+                return "error";
+                break;
+        }
+    };
+};
+
+Parser parser;
+
 int main(){
-    std::ifstream file("../tests/example1.txt");
+    std::ifstream file("example1.txt");
     std::stringstream buffer;
+    
     buffer << file.rdbuf();
     std::string content = buffer.str();
     lexer.text = content;
+    
     std::vector<Token> tokenList;
-    Token t = lexer.getToken;
+    Token t = lexer.getToken();
+    
     while(t.type != TokenType::END_OF_FILE){
         tokenList.push_back(t);
         t = lexer.getToken();
     }
-
+    
+    parser.tokens = tokenList;
+    parser.parseProgram();
+    std::cout << "Finished parsing\n";
+    
+    
     return 0;
 }
