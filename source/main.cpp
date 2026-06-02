@@ -338,7 +338,7 @@ class Parser{
     void parseDeclaration(){
         switch(peek().type){
             case TokenType::COMPONENT: parseComponent(); break;
-            //case TokenType::ENTITY: parseEntity(); break;
+            case TokenType::ENTITY: parseEntity(); break;
             //case TokenType::SYSTEM: parseSystem(); break;
             //case TokenType::THREADED: parseSystem(); break;
             //case TokenType::IO: parseIO(); break;
@@ -368,7 +368,23 @@ class Parser{
     };
     
     void parseEntity(){
+        expect(TokenType::ENTITY, "entity");
+        Token name = expect(TokenType::IDENT, "component name");
+        expect(TokenType::EQUALS, "entity equals");
+        expect(TokenType::LBRACE, "entity component list");
         
+        std::cout << "Entity: " << name.value << " = { ";
+        if (!check(TokenType::RBRACE)) {
+            std::cout << expect(TokenType::IDENT, "component name").value;
+            while (check(TokenType::COMMA)) {
+                advance();
+                std::cout << ", " << expect(TokenType::IDENT, "component name").value;
+            }
+        }
+        std::cout << " }" << std::endl;
+        
+        expect(TokenType::RBRACE, "end of entity");
+        expect(TokenType::SEMICOLON, "after entity");
     };
     
     private:
