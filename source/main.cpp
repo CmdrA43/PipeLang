@@ -312,7 +312,7 @@ struct systemDeclarationNode{
     bool isThreaded;
     std::string name;
     std::vector<parameterNode> parameters;
-    // make reference to expressions and statements eventually
+    // make reference to expressions and statements eventually for actual execution block
 };
 
 struct pipelineDeclarationNode{
@@ -372,66 +372,96 @@ class Parser{
     
     // recursion parsing
     
-    void parseProgram(){
+    programNode parseProgram(){
+        programNode program;
         while(!check(TokenType::PIPELINE) && !check(TokenType::END_OF_FILE)){
-            parseDeclaration();
+            parseDeclaration(program);
         }
         if(check(TokenType::PIPELINE)){
             //parsePipeline();
         }
         expect(TokenType::END_OF_FILE, "end of file");
+        return program;
     };
     
-    void parseDeclaration(){
+    void parseDeclaration(programNode program){
         switch(peek().type){
-            case TokenType::COMPONENT: parseComponent(); break;
-            case TokenType::ENTITY: parseEntity(); break;
-            //case TokenType::SYSTEM: parseSystem(); break;
-            //case TokenType::THREADED: parseSystem(); break;
-            //case TokenType::IO: parseIO(); break;
+            case TokenType::COMPONENT: program.components.push_back(parseComponent()); break;
+            case TokenType::ENTITY: program.entities.push_back(parseEntity()); break;
+            //case TokenType::SYSTEM: program.components.push_back(parseSystem()); break;
+            //case TokenType::THREADED: program.components.push_back(parseSystem()); break;
+            //case TokenType::IO: program.components.puch_back(parseIO()); break;
             default:
                 std::cerr << "Unexpected token " << tokenTypeName(peek().type) << " at start of declaration\n";
                 exit(1);
         }
     };
     
-    void parseComponent(){
+    componentDeclarationNode parseComponent(){
+        
+        componentDeclarationNode component;
+        
         expect(TokenType::COMPONENT, "component");
         Token name = expect(TokenType::IDENT, "component name");
+        component.name = name.value;
+        
         expect(TokenType::LBRACE, "component body");
+        
         
         std::cout << "Component: " << name.value << "\n";
         // parse fields until closing brace
         while (!check(TokenType::RBRACE)) {
+            fieldNode field;
             Token fieldName = expect(TokenType::IDENT, "field name");
+            field.name = fieldName.value;
+            
             expect(TokenType::COLON, "field type colon");
             Token fieldType = expect(TokenType::IDENT, "field type");
+            field.type = fieldType.value;
+            
             expect(TokenType::SEMICOLON, "after field");
             std::cout << "  field " << fieldName.value << " : " << fieldType.value << "\n";
+            
+            component.fields.push_back(field);
         }
         
         expect(TokenType::RBRACE, "end of component");
         expect(TokenType::SEMICOLON, "after component");
+        return component;
     };
     
-    void parseEntity(){
+    entityDeclarationNode parseEntity(){
+        entityDeclarationNode entity;
+        
         expect(TokenType::ENTITY, "entity");
         Token name = expect(TokenType::IDENT, "component name");
+        entity.name = name.value;
+        
         expect(TokenType::EQUALS, "entity equals");
         expect(TokenType::LBRACE, "entity component list");
         
         std::cout << "Entity: " << name.value << " = { ";
         if (!check(TokenType::RBRACE)) {
-            std::cout << expect(TokenType::IDENT, "component name").value;
+            
+            std::string componentName = expect(TokenType::IDENT, "component name").value;
+            entity.components.push_back(componentName);
+            
+            std::cout << componentName;
             while (check(TokenType::COMMA)) {
+                
                 advance();
-                std::cout << ", " << expect(TokenType::IDENT, "component name").value;
+                
+                componentName = expect(TokenType::IDENT, "component name").value;
+                entity.components.push_back(componentName);
+                
+                std::cout << ", " << componentName;
             }
         }
         std::cout << " }" << std::endl;
         
         expect(TokenType::RBRACE, "end of entity");
         expect(TokenType::SEMICOLON, "after entity");
+        return entity;
     };
     
     private:
