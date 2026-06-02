@@ -282,6 +282,53 @@ Lexer lexer;
 
 // --- PARSER ---
 
+//declaration nodes
+struct fieldNode{
+    std::string name;
+    std::string type;
+};
+
+struct componentDeclarationNode{
+    std::string name;
+    std::vector<fieldNode> fields;
+};
+
+struct entityDeclarationNode{
+    std::string name;
+    std::vector<std::string> components;
+};
+
+struct IODeclarationNode{
+    std::string name;
+    std::string type;
+};
+
+struct parameterNode{
+    std::string privligeLevel;
+    std::string name;
+};
+
+struct systemDeclarationNode{
+    bool isThreaded;
+    std::string name;
+    std::vector<parameterNode> parameters;
+    // make reference to expressions and statements eventually
+};
+
+struct pipelineDeclarationNode{
+    
+};
+
+
+struct programNode{
+    std::vector<componentDeclarationNode> components;
+    std::vector<entityDeclarationNode> entities;
+    std::vector<systemDeclarationNode> systems;
+    std::vector<IODeclarationNode> IOs;
+    
+    pipelineDeclarationNode pipe;
+};
+
 class Parser{
     public:
     std::vector<Token> tokens;
