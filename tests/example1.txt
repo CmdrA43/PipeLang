@@ -3,7 +3,7 @@ Component Velocity { dx: f32; dy: f32; };
 
 Entity Particle = { Position, Velocity };
 
-IO io.framebuffer: i32;   // memory-mapped framebuffer address
+IO.framebuffer: i32;
 
 System Threaded integrate(edit Position, edit Velocity) {
     let dt: f32 = 0.016;
@@ -11,7 +11,7 @@ System Threaded integrate(edit Position, edit Velocity) {
     Position.y += Velocity.dy * dt;
 }
 
-System render(read Position, read io.framebuffer) {
+System render(read Position, read IO.framebuffer) {
     draw_pixel(Position.x, Position.y, io.framebuffer);
 }
 
