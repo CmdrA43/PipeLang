@@ -391,7 +391,7 @@ class Parser{
         return program;
     };
     
-    void parseDeclaration(programNode program){
+    void parseDeclaration(programNode& program){
         switch(peek().type){
             case TokenType::COMPONENT: program.components.push_back(parseComponent()); break;
             case TokenType::ENTITY: program.entities.push_back(parseEntity()); break;
@@ -470,7 +470,8 @@ class Parser{
         return entity;
     };
     
-    void parseParam(parameterNode parameter){
+    parameterNode parseParam(){
+        parameterNode parameter;
         TokenType priv = peek().type;
         if (priv != TokenType::READ_PRIV && priv != TokenType::WRITE_PRIV && priv != TokenType::EDIT_PRIV) {
             std::cerr << "Expected access privilege (read/write/edit) but got " << tokenTypeName(priv) << "\n";
@@ -502,6 +503,7 @@ class Parser{
             parameter.name = compName.value;
             std::cout << "  param: " << access << " " << compName.value << "\n";
         }
+        return parameter;
     };
     
     IODeclarationNode parseIO(){
@@ -536,11 +538,10 @@ class Parser{
         std::cout << "System " << name.value << "(\n";
         
         if (!check(TokenType::RPAREN)) {
-            parameterNode parameter;
-            parseParam(parameter);
+            System.parameters.push_back(parseParam());
             while (check(TokenType::COMMA)) {
                 advance();
-                parseParam(parameter);
+                System.parameters.push_back(parseParam());
             }
         }
         expect(TokenType::RPAREN, "end of params");
@@ -553,7 +554,7 @@ class Parser{
         return System;
     };
     
-    void parsePipeline(programNode program){
+    void parsePipeline(programNode& program){
         expect(TokenType::PIPELINE, "pipeline");
         while(peek().type != TokenType::SEMICOLON){
             program.pipe.pipe.push_back(tokens[pos]);
