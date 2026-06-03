@@ -1,7 +1,7 @@
 Component Position { x: f32; y: f32; };
 Component Velocity { dx: f32; dy: f32; };
 
-entity Particle = { Position, Velocity };
+Entity Particle = { Position, Velocity };
 
 IO io.framebuffer: i32;   // memory-mapped framebuffer address
 
