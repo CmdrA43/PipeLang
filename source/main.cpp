@@ -224,6 +224,10 @@ class Lexer{
                         std::cout << "Got System token\n";
                         return Token{TokenType::SYSTEM, literal};
                     }
+                    else if(literal == "Threaded"){
+                        std::cout << "Got Threaded token\n";
+                        return Token{TokenType::THREADED, literal};
+                    }
                     else if(literal == "Pipeline"){
                         std::cout << "Got Pipeline token\n";
                         return Token{TokenType::PIPELINE, literal};
@@ -239,6 +243,10 @@ class Lexer{
                     else if(literal == "edit"){
                         std::cout << "Got edit token\n";
                         return Token{TokenType::EDIT_PRIV, literal};
+                    }
+                    else if(literal == "IO"){
+                        std::cout << "Got IO token\n";
+                        return Token{TokenType::IO, literal};
                     }
                     else if(literal == "if"){
                         std::cout << "Got if token\n";
@@ -316,9 +324,8 @@ struct systemDeclarationNode{
 };
 
 struct pipelineDeclarationNode{
-    
+    std::vector<Token> pipe;
 };
-
 
 struct programNode{
     std::vector<componentDeclarationNode> components;
@@ -378,7 +385,7 @@ class Parser{
             parseDeclaration(program);
         }
         if(check(TokenType::PIPELINE)){
-            //parsePipeline();
+            parsePipeline(program);
         }
         expect(TokenType::END_OF_FILE, "end of file");
         return program;
@@ -388,9 +395,8 @@ class Parser{
         switch(peek().type){
             case TokenType::COMPONENT: program.components.push_back(parseComponent()); break;
             case TokenType::ENTITY: program.entities.push_back(parseEntity()); break;
-            //case TokenType::SYSTEM: program.components.push_back(parseSystem()); break;
-            //case TokenType::THREADED: program.components.push_back(parseSystem()); break;
-            //case TokenType::IO: program.components.puch_back(parseIO()); break;
+            case TokenType::SYSTEM: program.systems.push_back(parseSystem()); break;
+            case TokenType::IO: program.IOs.push_back(parseIO()); break;
             default:
                 std::cerr << "Unexpected token " << tokenTypeName(peek().type) << " at start of declaration\n";
                 exit(1);
@@ -462,6 +468,98 @@ class Parser{
         expect(TokenType::RBRACE, "end of entity");
         expect(TokenType::SEMICOLON, "after entity");
         return entity;
+    };
+    
+    void parseParam(parameterNode parameter){
+        TokenType priv = peek().type;
+        if (priv != TokenType::READ_PRIV && priv != TokenType::WRITE_PRIV && priv != TokenType::EDIT_PRIV) {
+            std::cerr << "Expected access privilege (read/write/edit) but got " << tokenTypeName(priv) << "\n";
+            exit(1);
+        }
+        advance();
+        std::string access;
+        if(priv == TokenType::READ_PRIV){
+            access = "read";
+            parameter.privligeLevel = "read";
+        }
+        if(priv == TokenType::WRITE_PRIV){
+            access = "write";
+            parameter.privligeLevel = "write";
+        }
+        if(priv == TokenType::EDIT_PRIV){
+            access = "edit";
+            parameter.privligeLevel = "edit";
+        }
+        // next is IDENT or IO.IDENT
+        if (check(TokenType::IO)) {
+            advance();
+            expect(TokenType::DOT, "io dot");
+            Token ioName = expect(TokenType::IDENT, "io name");
+            parameter.name = ioName.value;
+            std::cout << "  param: " << access << " io." << ioName.value << "\n";
+        } else {
+            Token compName = expect(TokenType::IDENT, "component name");
+            parameter.name = compName.value;
+            std::cout << "  param: " << access << " " << compName.value << "\n";
+        }
+    };
+    
+    IODeclarationNode parseIO(){
+        IODeclarationNode interface;
+        expect(TokenType::IO, "IO identifier");
+        expect(TokenType::DOT, "dot accessor");
+        
+        Token name = expect(TokenType::IDENT, "interface name");
+        interface.name = name.value;
+        
+        expect(TokenType::COLON, "field type colon");
+        Token type = expect(TokenType::IDENT, "type");
+        interface.type = type.value;
+        
+        expect(TokenType::SEMICOLON, "after identifier");
+        
+        return interface;
+    };
+    
+    systemDeclarationNode parseSystem() {
+        systemDeclarationNode System;
+        
+        expect(TokenType::SYSTEM, "system keyword");
+        if(match(TokenType::THREADED)){
+            System.isThreaded = true;
+            std::cout << "Creating threaded system\n";
+        }
+        Token name = expect(TokenType::IDENT, "system name");
+        System.name = name.value;
+        
+        expect(TokenType::LPAREN, "systems parameters");
+        std::cout << "System " << name.value << "(\n";
+        
+        if (!check(TokenType::RPAREN)) {
+            parameterNode parameter;
+            parseParam(parameter);
+            while (check(TokenType::COMMA)) {
+                advance();
+                parseParam(parameter);
+            }
+        }
+        expect(TokenType::RPAREN, "end of params");
+        
+        expect(TokenType::LBRACE, "system body");
+        while(!check(TokenType::RBRACE)){
+            advance();
+        }
+        expect(TokenType::RBRACE, "body end");
+        return System;
+    };
+    
+    void parsePipeline(programNode program){
+        expect(TokenType::PIPELINE, "pipeline");
+        while(peek().type != TokenType::SEMICOLON){
+            program.pipe.pipe.push_back(tokens[pos]);
+            advance();
+        }
+        expect(TokenType::SEMICOLON, "pipeline end");
     };
     
     private:
