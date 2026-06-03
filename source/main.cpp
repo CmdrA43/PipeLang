@@ -545,6 +545,7 @@ class Parser{
             }
         }
         expect(TokenType::RPAREN, "end of params");
+        std::cout << ")\n";
         
         expect(TokenType::LBRACE, "system body");
         while(!check(TokenType::RBRACE)){
