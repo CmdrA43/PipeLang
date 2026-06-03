@@ -5,13 +5,13 @@ Entity Particle = { Position, Velocity };
 
 IO io.framebuffer: i32;   // memory-mapped framebuffer address
 
-threaded system integrate(edit Position, edit Velocity) {
+System Threaded integrate(edit Position, edit Velocity) {
     let dt: f32 = 0.016;
     Position.x += Velocity.dx * dt;
     Position.y += Velocity.dy * dt;
 }
 
-system render(read Position, read io.framebuffer) {
+System render(read Position, read io.framebuffer) {
     draw_pixel(Position.x, Position.y, io.framebuffer);
 }
 
