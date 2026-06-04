@@ -13,7 +13,7 @@ Component Position{ x: f32; y: f32; };
 Component Velocity{ dx: f32; dy: f32; };
 ```
 You start with writing out the `Component` keyword, followed by the name of your new component, then list all of its fields inside braces. Fields are defined with the name of the field, followed immediately by a colon, then by a recognized type, and finally, a semicolon.
-### Entites
+### Entities
 Entites are less of object instances, and more of object classes or structs. They act as a way to create an instance of multiple components all at once, tied to the same identifier. You would write out the definition for one as:
 ```PipeLang
 Entity Particle = { Position, Velocity };
@@ -82,7 +82,7 @@ Where `x` is the size of the array. You can also put a second set of brackets af
 * Expression lexing and parsing
 * Array integration
 * Full Pipeline feature integration
-  * `>>` for stage seperation
+  * `>>` for stage separation
   * `{}` for grouping of stages
   * `|` for stage fusion
 * Compile Time performance guarantees
