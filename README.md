@@ -52,9 +52,27 @@ When writing a pipeline, you can group, `{}`, fuse, `|`, and seperate, `>>`, dif
 Pipeline
   {{A >> B} | C} >> D >> {E | F} >> G ;
 ```
+## Normal Programming Things
+### Types
+To ensure compile-time memory safety, only a few different types are supported:
+* `i32`
+* `i64`
+* `f32`
+* `f64`
+* `u32`
+* `u64`
+* `bool`  
+Types also cannot be implicitly casted to ensure data safety. If you want to add an `i32` to an `i64`, you must cast `i64` to the `i32` value or variable or vice versa. This also ensures no reallocation during runtime eating up precious cycles.
+### Data Structures
+The only supported data structures currently on the roadmap are arrays. They are defined as such:
+```PipeLang
+let list: i64[x];
+```
+Where `x` is the size of the array. You can also put a second set of brackets after the first one like: `i64[x][y]` to make 2d arrays, which can substitue for a lot of things.
 ## Future Feature List
 * Finishing the parser
 * Expression lexing and parsing
+* Array integration
 * Full Pipeline feature integration
   * `>>` for stage seperation
   * `{}` for grouping of stages
