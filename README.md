@@ -25,8 +25,8 @@ Systems are not necesarily functions in the classic sense. When you define a sys
 ```PipeLang
 System integrate(edit Position, read Velocity){
   let dt: f32 = 0.016;
-  Position.x += Velocty.dx * dt;
-  Position.y += Velocty.dy * dt;
+  Position.x += Velocity.dx * dt;
+  Position.y += Velocity.dy * dt;
 };
 ```
   When defining a system, you start with the `System` keyword, then put the name you want it to have, then enclose all the required components in parentheses. Note the words before the different referenced components, namely `edit` and `read`. These are special access identifiers used to determine how the system accesses the data, and whether that data should be mutable by that system or not. The three access keywords are:
