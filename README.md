@@ -62,3 +62,4 @@ Pipeline
 * Compile Time performance guarantees
   * WCET calculation for each system
   * In-depth memory usage analysis
+  * Fuse and Threaded compiler hints
