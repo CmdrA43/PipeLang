@@ -41,6 +41,17 @@ The next part of systems is the `Threaded` keyword. This tells the compiler to c
 ```Pipelang
 System Threaded integrate(edit Position, read Velocity){...};
 ```
+### Pipelines
+At the very end of everything, you have to tell the compiler how you want it all to come together. This is where pipelines come in. They take all of the keywords thrown in, put a couple extra ones on the front and back for things like I/O, and then compile it. A pipeline is usually defined like this:
+```PipeLang
+Pipeline
+  { input_handler | AI_update } >> physics >> { animation | sound } >> render;
+```
+When writing a pipeline, you can group, `{}`, fuse, `|`, and seperate, `>>`, different systems into stages. Systems can be fused to run at the same time, basically acting as the same system, as long as they don't have any colliding `edit` or `write` components. Another more complicated example could look like:
+```Pipelang
+Pipeline
+  {{A >> B} | C} >> D >> {E | F} >> G ;
+```
 ## Future Feature List
 * Finishing the parser
 * Expression lexing and parsing
