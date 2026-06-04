@@ -12,7 +12,7 @@ System Threaded integrate(edit Position, edit Velocity) {
 }
 
 System render(read Position, read IO.framebuffer) {
-    draw_pixel(Position.x, Position.y, io.framebuffer);
+    draw_pixel(Position.x, Position.y, IO.framebuffer);
 }
 
 Pipeline main_pipe:
