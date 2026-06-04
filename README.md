@@ -68,7 +68,7 @@ The only supported data structures currently on the roadmap are arrays. They are
 ```PipeLang
 let list: i64[x];
 ```
-Where `x` is the size of the array. You can also put a second set of brackets after the first one like: `i64[x][y]` to make 2d arrays, which can substitue for a lot of things.
+Where `x` is the size of the array. You can also put a second set of brackets after the first one like: `i64[x][y]` to make 2d arrays, which can substitue for a lot of things. There is intent to support n-dimensional arrays in the future.
 ## Future Feature List
 * Finishing the parser
 * Expression lexing and parsing
