@@ -47,7 +47,7 @@ At the very end of everything, you have to tell the compiler how you want it all
 Pipeline
   { input_handler | AI_update } >> physics >> { animation | sound } >> render;
 ```
-When writing a pipeline, you can group, `{}`, fuse, `|`, and seperate, `>>`, different systems into stages. Systems can be fused to run at the same time, basically acting as the same system, as long as they don't have any colliding `edit` or `write` components. Another more complicated example could look like:
+When writing a pipeline, you can group, `{}`, fuse, `|`, and seperate, `>>`, different systems into stages. Systems can be fused to run as one singular system, as long as they don't have any colliding `edit` or `write` components. Another more complicated example could look like:
 ```Pipelang
 Pipeline
   {{A >> B} | C} >> D >> {E | F} >> G ;
@@ -63,6 +63,14 @@ To ensure compile-time memory safety, only a few different types are supported:
 * `u64`
 * `bool`  
 Types also cannot be implicitly casted to ensure data safety. If you want to add an `i32` to an `i64`, you must cast `i64` to the `i32` value or variable or vice versa. This also ensures no reallocation during runtime eating up precious cycles.
+### Variables
+Local system variables outside of component fields are allowed and defined as such:
+```PipeLang
+let name: type;
+let name: type = value;
+name = value;
+```
+They are not yet integrated, but will act as local variables that stay persistent for the entire duration of the system/stage execution. If two systems are fused into a single stage/system then the local variable will exist inside the new system/stage. Local variables will not be permitted in `Threaded` systems, as that is a race condition issue.
 ### Data Structures
 The only supported data structures currently on the roadmap are arrays. They are defined as such:
 ```PipeLang
