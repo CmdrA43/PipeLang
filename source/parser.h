@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <memory>
 
 // --- PARSER ---
 
@@ -36,8 +37,32 @@ struct systemDeclarationNode{
     // make reference to expressions and statements eventually for actual execution block
 };
 
+// pipeline nodes for parsing/enum for stage types
+
+enum class StageType{
+    SYSTEM,
+    SUB_PIPELINE
+};
+
+struct pipelineSequenceNode;
+
+struct stageNode{
+    StageType type;
+    std::string systemName;
+    std::unique_ptr<pipelineSequenceNode> subPipe;
+};
+
+struct parallelGroupNode{
+    std::vector<stageNode> stages;
+};
+
+struct pipelineSequenceNode{
+    std::vector<parallelGroupNode> steps;
+};
+
 struct pipelineDeclarationNode{
-    std::vector<Token> pipe;
+    std::string name;
+    pipelineSequenceNode seq;
 };
 
 struct programNode{
@@ -269,12 +294,54 @@ class Parser{
         return System;
     };
     
+    pipelineSequenceNode parsePipelineSequence(){
+        pipelineSequenceNode seq;
+        std::cout << "  Seq: ";
+        seq.steps.push_back(parseParallelGroup());
+        while(match(TokenType::RIGHT_ARROW)){
+            std::cout << " >> ";
+            seq.steps.push_back(parseParallelGroup());
+        }
+        std::cout << "\n";
+        return seq;
+    };
+
+    parallelGroupNode parseParallelGroup(){
+        parallelGroupNode group;
+        std::cout << "    Group: ";
+        group.stages.push_back(parseStage());
+        while(match(TokenType::PIPE)){
+            std::cout << " | ";
+            group.stages.push_back(parseStage());
+        }
+        return group;
+    };
+
+    stageNode parseStage(){
+        stageNode stage;
+        if(check(TokenType::LBRACE)){
+            advance();
+            std::cout << " { ";
+            stage.type = StageType::SUB_PIPELINE;
+            stage.subPipe = std::make_unique<pipelineSequenceNode>(parsePipelineSequence());
+            expect(TokenType::RBRACE, "closing brace in pipeline");
+            std::cout << " } ";
+        } else {
+            Token name = expect(TokenType::IDENT, "system identifier");
+            stage.type = StageType::SYSTEM;
+            stage.systemName = name.value;
+            std::cout << name.value;
+        }
+        return stage;
+    };
+
     void parsePipeline(programNode& program){
         expect(TokenType::PIPELINE, "pipeline");
-        while(peek().type != TokenType::SEMICOLON){
-            program.pipe.pipe.push_back(tokens[pos]);
-            advance();
-        }
+        Token pipeName = expect(TokenType::IDENT, "name");
+        std::cout << "Pipeline: " << pipeName.value << "\n";
+        program.pipe.name = pipeName.value;
+        expect(TokenType::COLON, "pipeline definition colon");
+        program.pipe.seq = parsePipelineSequence();
         expect(TokenType::SEMICOLON, "pipeline end");
     };
 
