@@ -11,6 +11,7 @@ enum class TokenType{
     THREADED,
     FUSE,
     PIPELINE,
+    TYPE,
     // system priviliges
     READ_PRIV,
     WRITE_PRIV,
@@ -256,6 +257,34 @@ class Lexer{
                     else if(literal == "let"){
                         std::cout << "Got let token\n";
                         return Token{TokenType::LET, literal};
+                    }
+                    else if(literal == "i32"){
+                        std::cout << "Got i32 token\n";
+                        return Token{TokenType::TYPE, literal};
+                    }
+                    else if(literal == "f32"){
+                        std::cout << "Got f32 token\n";
+                        return Token{TokenType::TYPE, literal};
+                    }
+                    else if(literal == "u32"){
+                        std::cout << "Got u32 token\n";
+                        return Token{TokenType::TYPE, literal};
+                    }
+                    else if(literal == "i64"){
+                        std::cout << "Got i64 token\n";
+                        return Token{TokenType::TYPE, literal};
+                    }
+                    else if(literal == "f64"){
+                        std::cout << "Got f64 token\n";
+                        return Token{TokenType::TYPE, literal};
+                    }
+                    else if(literal == "u64"){
+                        std::cout << "Got u64 token\n";
+                        return Token{TokenType::TYPE, literal};
+                    }
+                    else if(literal == "bool"){
+                        std::cout << "Got bool token\n";
+                        return Token{TokenType::TYPE, literal};
                     }
                     // return as an identifier
                     else{

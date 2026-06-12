@@ -135,7 +135,7 @@ class Parser{
             field.name = fieldName.value;
             
             expect(TokenType::COLON, "field type colon");
-            Token fieldType = expect(TokenType::IDENT, "field type");
+            Token fieldType = expect(TokenType::TYPE, "field type");
             field.type = fieldType.value;
             
             expect(TokenType::SEMICOLON, "after field");
@@ -163,6 +163,7 @@ class Parser{
         if (!check(TokenType::RBRACE)) {
             
             std::string componentName = expect(TokenType::IDENT, "component name").value;
+            
             entity.components.push_back(componentName);
             
             std::cout << componentName;
@@ -228,7 +229,7 @@ class Parser{
         interface.name = name.value;
         
         expect(TokenType::COLON, "field type colon");
-        Token type = expect(TokenType::IDENT, "type");
+        Token type = expect(TokenType::TYPE, "type");
         interface.type = type.value;
         
         expect(TokenType::SEMICOLON, "after identifier");
@@ -276,7 +277,7 @@ class Parser{
         }
         expect(TokenType::SEMICOLON, "pipeline end");
     };
-    
+
     private:
     std::string tokenTypeName(TokenType type){
         switch(type){
