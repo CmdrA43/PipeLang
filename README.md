@@ -1,5 +1,8 @@
 # PipeLang
 PipeLang is a compile-time guaranteed high performance language based around ECS design, a pipeline structure, and no runtime allocation of anything at all.
+
+*PSST, hey you, wanna get into the weeds of this language? Join our [Github discussions](https://github.com) because I don't feel like checking anywhere else.*
+
 ## Main Structure
 PipeLang reads like a header file, primarily consisting of definitions and behaviors, with a single `Pipeline` statement at the end with a line of different listed systems and syntax to create a pipeline for the application. The different built in high-level structures consist of:
 * `Component`
