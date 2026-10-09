@@ -66,11 +66,7 @@ Note how only the condition index is passed and not anything else, as those exis
 ### Entrypoints / Events
 Of course, no application can be used by someone unless you allow input. The `Event` keyword and `Entrypoint` sub-system allow for this to happen. You first define an Event signature like below.
 ```PipeLang
-Event mouseInp{
-  type: i32 = SystemMouseEvent;
-  mouseX: f32;
-  mouseY: f32;
-};
+Event<SystemMouseEvent> mouseInp{ mouseX: f32; mouseY: f32; };
 ```
 This is a sort of layout, like a Component, where you have a set value that is read by the hardware and if the first part of the actual passed Event matches this, the rest of the data is parsed into the Event signature, and then an Entrypoint is injected into the avaliable task pool.
 An Entrypoint is a special type of Callback, one that acts as the point of entering a callback tree for a specific event type. It is defined like this, where `MouseState` is some Instance that contains the state of the mouse for the program.

@@ -246,6 +246,24 @@ class Parser{
         expect(TokenType::SEMICOLON, "after instance");
         return instance;
     };
+
+    eventDeclarationNode parseEvent(){
+        eventDeclarationNode event;
+
+        expect(TokenType::EVENT, "event");
+
+        expect(TokenType::LCARAT, "opening carat");
+        Token eventType = expect(TokenType::IDENT, "event type");
+        event.eventType = type;
+        expect(TokenType::RCARAT, "closing carat");
+
+        Token name = expect(TokenType::IDENT, "name");
+        event.name = name;
+
+        expect(TokenType::LBRACE, "opening brace");
+
+        // make a field parsing loop here
+    };
     
     parameterNode parseParam(){
         parameterNode parameter;
@@ -270,7 +288,7 @@ class Parser{
         Token compName = expect(TokenType::IDENT, "component name");
         parameter.name = compName.value;
         std::cout << "  param: " << access << " " << compName.value << "\n";
-        
+
         return parameter;
     };
     
