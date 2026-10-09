@@ -4,15 +4,28 @@
 
 enum class TokenType{
     // reserved keywords
+
+    // data structures
     ENTITY,
     COMPONENT,
+    INSTANCE,
+    EVENT,
+    // structure creation methods
+    CREATE,
+    GENERATE,
+    // functional definers
     SYSTEM,
-    IO,
-    THREADED,
+    CALLBACK,
+    ENTRYPOINT,
+    // execution flow
+    EXIT,
+    HOOK,
     FUSE,
     PIPELINE,
+    // variables
     TYPE,
-    // system priviliges
+
+    // argument priviliges
     READ_PRIV,
     WRITE_PRIV,
     EDIT_PRIV,
@@ -23,6 +36,8 @@ enum class TokenType{
     RBRACE,
     LBRACKET,
     RBRACKET,
+    LCARAT,
+    RCARAT,
     // delimiter symbols
     COMMA,
     SEMICOLON,
@@ -85,7 +100,7 @@ class Lexer{
             case ')':
                 std::cout << "Got right parenthesis token\n";
                 pos++;
-                return Token{TokenType::RPAREN, "("};
+                return Token{TokenType::RPAREN, ")"};
                 break;
             case '{':
                 std::cout << "Got left brace token\n";
@@ -106,6 +121,16 @@ class Lexer{
                 std::cout << "Got right bracket token\n";
                 pos++;
                 return Token{TokenType::RBRACKET, "]"};
+                break;
+            case '<':
+                std::cout << "Got left carat token\n";
+                pos++;
+                return Token{TokenType::LCARAT, "<"};
+                break;
+            case '>':
+                std::cout << "Got right carat token\n";
+                pos++;
+                return Token{TokenType::RCARAT, ">"};
                 break;
 
             // delimiters
@@ -218,13 +243,41 @@ class Lexer{
                         std::cout << "Got Component token\n";
                         return Token{TokenType::COMPONENT, literal};
                     }
+                    else if(literal == "Instance"){
+                        std::cout << "Got Instance token\n";
+                        return Token{TokenType::INSTANCE, literal};
+                    }
+                    else if(literal == "Event"){
+                        std::cout << "Got Event token\n";
+                        return Token{TokenType::EVENT, literal};
+                    }
+                    else if(literal == "Create"){
+                        std::cout << "Got Create token\n";
+                        return Token{TokenType::CREATE, literal};
+                    }
+                    else if(literal == "Generate"){
+                        std::cout << "Got Generate token\n";
+                        return Token{TokenType::Generate, literal};
+                    }
                     else if(literal == "System"){
                         std::cout << "Got System token\n";
                         return Token{TokenType::SYSTEM, literal};
                     }
-                    else if(literal == "Threaded"){
-                        std::cout << "Got Threaded token\n";
-                        return Token{TokenType::THREADED, literal};
+                    else if(literal == "Callback"){
+                        std::cout << "Got Callback token\n";
+                        return Token{TokenType::CALLBACK, literal};
+                    }
+                    else if(literal == "Entrypoint"){
+                        std::cout << "Got Entrypoint token\n";
+                        return Token{TokenType::ENTRYPOINT, literal};
+                    }
+                    else if(literal == "exit"){
+                        std::cout << "Got exit token\n";
+                        return Token{TokenType::EXIT, literal};
+                    }
+                    else if(literal == "hook"){
+                        std::cout << "Got hook token\n";
+                        return Token{TokenType::HOOK, literal};
                     }
                     else if(literal == "Pipeline"){
                         std::cout << "Got Pipeline token\n";
@@ -241,10 +294,6 @@ class Lexer{
                     else if(literal == "edit"){
                         std::cout << "Got edit token\n";
                         return Token{TokenType::EDIT_PRIV, literal};
-                    }
-                    else if(literal == "IO"){
-                        std::cout << "Got IO token\n";
-                        return Token{TokenType::IO, literal};
                     }
                     else if(literal == "if"){
                         std::cout << "Got if token\n";

@@ -25,7 +25,7 @@ Entites are less of object instances, and more of object classes or structs. The
 Entity Particle = { Position, Velocity };
 ```
 They are mildly similar to component definitions, except you obviously use the `Entity` keyword, then your name, and then set it equal to a list of different components you have already defined, enclosed in braces.  
-In order to spawn entities, you use `Entity.create(num);` which automatically creates an ID, "allocates" space for the new components in their respective groups, and then ties those instances to the global ID. You would replace `Entity` with your entity type, and then it would create a number `num` of entites of that type. However, nothing is actually created. You define a number for your max number of entities at the top of the file, and then it sets an alive/dead flag for the data. Everything in memory is actually stored in an SoA or sparse set style ECS.
+In order to spawn entities, you use `Entity.Create(num);` which automatically creates an ID, "allocates" space for the new components in their respective groups, and then ties those instances to the global ID. You would replace `Entity` with your entity type, and then it would create a number `num` of entites of that type. However, nothing is actually created. You define a number for your max number of entities at the top of the file, and then it sets an alive/dead flag for the data. Everything in memory is actually stored in an SoA or sparse set style ECS.
 ### Instances
 An instance is a single, global copy of some entity type. It is defined as such.
 ```PipeLang
@@ -50,10 +50,6 @@ System integrate(edit Position, read Velocity){
 This field list tells the compiler how to properly structure the function so that it can correctly identify all user-defined entities that it should pass to the function.  
 After this are some braces, which contain the function body. Here, the Position component needs `edit` privileges, because it both has to read the data (to know what to increment from) and write to it. However, the Velocity component only needs `read` privileges, because it is only used to increment the velocity. The `exit;` keyword at the end is also used to figure out if this thread should release its task and be assigned a new one, instead of requesting a callback.
 For systems where you don't need to iterate over any entities, you simply don't give it any arguments.  
-The next part of systems is the `Threaded` keyword. This tells the compiler to construct the final application in a manner that allows that system to be dispatched across multiple execution threads if needed. If we wanted to take our `integrate` system and make it threaded, we would simply change the first line to look like this.
-```Pipelang
-System Threaded integrate(edit Position, read Velocity){...};
-```
 ### Callbacks / Hooks
 Of course, if you can't branch when you need to, or it makes more sense to isolate some process or series of processes to execute upon certain conditions, programming becomes a lot more difficult, and the pure iteration loops can become bloated.
 And comes the one thing that can fix this, the `Callback`, and the `hook`.
@@ -141,4 +137,4 @@ Where `x` is the size of the array. You can also put a second set of brackets af
 * Compile Time performance guarantees
   * WCET calculation for each system
   * In-depth memory usage analysis
-  * Fuse and Threaded compiler hints
+  * Fuse compiler hints
