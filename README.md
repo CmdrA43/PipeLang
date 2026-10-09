@@ -55,12 +55,12 @@ Of course, if you can't branch when you need to, or it makes more sense to isola
 And comes the one thing that can fix this, the `Callback`, and the `hook`.
 When defining a Callback, you define it similarly to a function, as such.
 ```Pipelang
-Callback spawnParticles(idx: i32, read position, read particleSampler){...};
+Callback spawnParticles(read position, read particleSampler){...};
 ```
-Arguments here work a bit differently, you are really just letting the compiler know what handles on what objects it has because it most likely isn't iterating over every single entity. You can also pass arguments to it to target specific instances of things. Like in the above example, where we pass an index in to get the index of the position that we want to use the particleSampler with.
+Arguments here work a bit differently, you are really just letting the compiler know what handles on what objects it has because it most likely isn't iterating over every single entity. Because of how this works at a hardware level, anything that was local in the previous execution block, stays local, and can continue to be used inside the callback.
 Of course, if you can't actually "call back" to this, it's entirely useless. Enter, the `hook` keyword. This keyword is used in Systems and in Callbacks to tell the hardware that if this line is reached, that you need to swap the instructions in the cache to be the designated callback, which is done like so.
 ```PipeLang
-hook spawnParticles(conditionIndex);
+hook spawnParticles();
 ```
 Note how only the condition index is passed and not anything else, as those exist as global lists and Instances in the program state that can be easily targeted. This is used instead of an `exit;` statement and the thread doesn't release it's task, but instead change it where it would release later in some Callback. This means that even at the end of a long or short Callback tree, it would `exit;` releasing the task from the thread.
 ### Entrypoints / Events

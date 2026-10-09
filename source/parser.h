@@ -20,6 +20,17 @@ struct entityDeclarationNode{
     std::vector<std::string> components;
 };
 
+struct instanceDeclarationNode{
+    std::string name;
+    std::string entityType;
+};
+
+struct eventDeclarationNode{
+    std::string name;
+    std::string type;
+    std::vector<std::string> components;
+};
+
 struct parameterNode{
     std::string privligeLevel;
     std::string name;
@@ -29,6 +40,17 @@ struct systemDeclarationNode{
     std::string name;
     std::vector<parameterNode> parameters;
     // make reference to expressions and statements eventually for actual execution block
+};
+
+struct callbackDeclarationNode{
+    std::string name;
+    std::vector<parameterNode> parameters;
+};
+
+struct entrypointDeclarationNode{
+    std::string name;
+    std::string eventSignature;
+    std::vector<parameterNode> parameters;
 };
 
 // pipeline nodes for parsing/enum for stage types
@@ -62,7 +84,11 @@ struct pipelineDeclarationNode{
 struct programNode{
     std::vector<componentDeclarationNode> components;
     std::vector<entityDeclarationNode> entities;
+    std::vector<instanceDeclarationNode> instances;
+    std::vector<eventDeclarationNode> events;
     std::vector<systemDeclarationNode> systems;
+    std::vector<callbackDeclarationNode> callbacks;
+    std::vector<entrypointDeclarationNode> entrypoints;
     
     pipelineDeclarationNode pipe;
 };
@@ -126,7 +152,12 @@ class Parser{
         switch(peek().type){
             case TokenType::COMPONENT: program.components.push_back(parseComponent()); break;
             case TokenType::ENTITY: program.entities.push_back(parseEntity()); break;
+            case TokenType::INSTANCE: program.instances.push_back(parseInstance()); break;
+            //case TokenType::EVENT: program.events.push_back(parseEvent()); break;
+
             case TokenType::SYSTEM: program.systems.push_back(parseSystem()); break;
+            //case TokenType::CALLBACK: program.callbacks.push_back(parseCallback()); break;
+            //case TokenType::ENTRYPOINT: program.entrypoints.push_back(parseEntrypoint()); break;
             default:
                 std::cerr << "Unexpected token " << tokenTypeName(peek().type) << " at start of declaration\n";
                 exit(1);
@@ -199,6 +230,21 @@ class Parser{
         expect(TokenType::RBRACE, "end of entity");
         expect(TokenType::SEMICOLON, "after entity");
         return entity;
+    };
+
+    instanceDeclarationNode parseInstance(){
+        instanceDeclarationNode instance;
+
+        expect(TokenType::INSTANCE, "instance");
+
+        Token type = expect(TokenType::IDENT, "instance type");
+        instance.entityType = type;
+
+        Token name = expect(TokenType::IDENT, "instance identifier");
+        instance.name = name;
+
+        expect(TokenType::SEMICOLON, "after instance");
+        return instance;
     };
     
     parameterNode parseParam(){
