@@ -265,11 +265,12 @@ class Parser{
         } else if(priv == TokenType::EDIT_PRIV){
             access = "edit";
             parameter.privligeLevel = "edit";
-        } else { // next is IDENT
-            Token compName = expect(TokenType::IDENT, "component name");
-            parameter.name = compName.value;
-            std::cout << "  param: " << access << " " << compName.value << "\n";
         }
+        
+        Token compName = expect(TokenType::IDENT, "component name");
+        parameter.name = compName.value;
+        std::cout << "  param: " << access << " " << compName.value << "\n";
+        
         return parameter;
     };
     
