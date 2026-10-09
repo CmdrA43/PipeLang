@@ -7,7 +7,10 @@ PipeLang is a compile-time guaranteed high performance language based around ECS
 PipeLang reads like a header file, primarily consisting of definitions and behaviors, with a single `Pipeline` statement at the end with a line of different listed systems and syntax to create a pipeline for the application. The different built in high-level structures consist of:
 * `Component`
 * `Entity`
+* `Instance`
 * `System`
+* `Callback/Hook`
+* `Entrypoint/Event`
 * `Pipeline`
 ### Components
 In PipeLang, the first thing you want to define are your components. These will be the things that you attach to different Entity types and also the different arguments you pass to Systems. They are defined as:
@@ -22,7 +25,13 @@ Entites are less of object instances, and more of object classes or structs. The
 Entity Particle = { Position, Velocity };
 ```
 They are mildly similar to component definitions, except you obviously use the `Entity` keyword, then your name, and then set it equal to a list of different components you have already defined, enclosed in braces.  
-In order to spawn entities, you use `Entity.create(num);` which automatically creates an ID, allocates space for the new components in their respective groups, and then ties those instances to the global ID. You would replace `Entity` with your entity type, and then it would create a number `num` of entites of that type. However, nothing is actually created. You define a number for your max number of entities at the top of the file, and then it sets an alive/dead flag for the data. Everything in memory is actually stored in an SoA or sparse set style ECS.
+In order to spawn entities, you use `Entity.create(num);` which automatically creates an ID, "allocates" space for the new components in their respective groups, and then ties those instances to the global ID. You would replace `Entity` with your entity type, and then it would create a number `num` of entites of that type. However, nothing is actually created. You define a number for your max number of entities at the top of the file, and then it sets an alive/dead flag for the data. Everything in memory is actually stored in an SoA or sparse set style ECS.
+### Instances
+An instance is a single, global copy of some entity type. It is defined as such.
+```PipeLang
+Instance Particle particleSampler;
+```
+When referencing this, you have to include it in the arguments in a system or callback so that the compiler can avoid memory collisions.
 ### Systems
 Systems are not necesarily functions in the classic sense. When you define a system, you write something that looks like it will run once, and then the compiler makes sure to generate code that iterates it over all entities with the given inputs. A system definition looks something like this:
 ```PipeLang
@@ -44,17 +53,32 @@ The next part of systems is the `Threaded` keyword. This tells the compiler to c
 ```Pipelang
 System Threaded integrate(edit Position, read Velocity){...};
 ```
+### Callbacks / Hooks
+Of course, if you can't branch when you need to, or it makes more sense to isolate some process or series of processes to execute upon certain conditions, programming becomes a lot more difficult, and the pure iteration loops can become bloated.
+And comes the one thing that can fix this, the `Callback`, and the `hook`.
+When defining a Callback, you define it similarly to a function, as such.
+```Pipelang
+Callback spawnParticles(idx: i32, read position, read particleSampler){...};
+```
+Arguments here work a bit differently, you are really just letting the compiler know what handles on what objects it has because it most likely isn't iterating over every single entity. You can also pass arguments to it to target specific instances of things. Like in the above example, where we pass an index in to get the index of the position that we want to use the particleSampler with.
+Of course, if you can't actually "call back" to this, it's entirely useless. Enter, the `hook` keyword. This keyword is used in Systems and in Callbacks to tell the hardware that if this line is reached, that you need to swap the instructions in the cache to be the designated callback, which is done like so:
+```PipeLang
+hook spawnParticles(conditionIndex);
+```
+Note how only the condition index is passed and not anything else, as those exist as global lists and Instances in the program state that can be easily targeted.
 ### Pipelines
 At the very end of everything, you have to tell the compiler how you want it all to come together. This is where pipelines come in. They take all of the keywords thrown in, put a couple extra ones on the front and back for things like I/O, and then compile it. A pipeline is usually defined like this:
 ```PipeLang
 Pipeline
-  { input_handler | AI_update } >> physics >> { animation | sound } >> render;
+  AI_update >> physics >> { animation | sound } >> render;
 ```
 When writing a pipeline, you can group, `{}`, fuse, `|`, and seperate, `>>`, different systems into stages. Systems can be fused to run as one singular system, as long as they don't have any colliding `edit` or `write` components. Another more complicated example could look like:
 ```Pipelang
 Pipeline
   {{A >> B} | C} >> D >> {E | F} >> G ;
 ```
+The compiler breakes this down internally further, making large loops multiple parallel groups and making it so that fused systems run on different threads. It also implicity ties in the callbacks and entrypoints for a full execution graph.
+
 ## Normal Programming Things
 ### Types
 To ensure compile-time memory safety, only a few different types are supported:
