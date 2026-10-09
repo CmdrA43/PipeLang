@@ -26,7 +26,6 @@ struct parameterNode{
 };
 
 struct systemDeclarationNode{
-    bool isThreaded;
     std::string name;
     std::vector<parameterNode> parameters;
     // make reference to expressions and statements eventually for actual execution block
@@ -214,23 +213,13 @@ class Parser{
         if(priv == TokenType::READ_PRIV){
             access = "read";
             parameter.privligeLevel = "read";
-        }
-        if(priv == TokenType::WRITE_PRIV){
+        } else if(priv == TokenType::WRITE_PRIV){
             access = "write";
             parameter.privligeLevel = "write";
-        }
-        if(priv == TokenType::EDIT_PRIV){
+        } else if(priv == TokenType::EDIT_PRIV){
             access = "edit";
             parameter.privligeLevel = "edit";
-        }
-        // next is IDENT or IO.IDENT
-        if (check(TokenType::IO)) {
-            advance();
-            expect(TokenType::DOT, "io dot");
-            Token ioName = expect(TokenType::IDENT, "io name");
-            parameter.name = ioName.value;
-            std::cout << "  param: " << access << " io." << ioName.value << "\n";
-        } else {
+        } else { // next is IDENT
             Token compName = expect(TokenType::IDENT, "component name");
             parameter.name = compName.value;
             std::cout << "  param: " << access << " " << compName.value << "\n";
@@ -241,11 +230,6 @@ class Parser{
     systemDeclarationNode parseSystem() {
         systemDeclarationNode System;
         
-        expect(TokenType::SYSTEM, "system keyword");
-        if(match(TokenType::THREADED)){
-            System.isThreaded = true;
-            std::cout << "Creating threaded system\n";
-        }
         Token name = expect(TokenType::IDENT, "system name");
         System.name = name.value;
         
