@@ -39,6 +39,7 @@ System integrate(edit Position, read Velocity){
   let dt: f32 = 0.016;
   Position.x += Velocity.dx * dt;
   Position.y += Velocity.dy * dt;
+  exit;
 };
 ```
   When defining a system, you start with the `System` keyword, then put the name you want it to have, then enclose all the required components in parentheses. Note the words before the different referenced components, namely `edit` and `read`. These are special access identifiers used to determine how the system accesses the data, and whether that data should be mutable by that system or not. The three access keywords are:
@@ -47,7 +48,7 @@ System integrate(edit Position, read Velocity){
 * `edit` (both read and write permissions)
 
 This field list tells the compiler how to properly structure the function so that it can correctly identify all user-defined entities that it should pass to the function.  
-After this are some braces, which contain the function body. Here, the Position component needs `edit` privileges, because it both has to read the data (to know what to increment from) and write to it. However, the Velocity component only needs `read` privileges, because it is only used to increment the velocity.  
+After this are some braces, which contain the function body. Here, the Position component needs `edit` privileges, because it both has to read the data (to know what to increment from) and write to it. However, the Velocity component only needs `read` privileges, because it is only used to increment the velocity. The `exit;` keyword at the end is also used to figure out if this thread should release its task and be assigned a new one, instead of requesting a callback.
 For systems where you don't need to iterate over any entities, you simply don't give it any arguments.  
 The next part of systems is the `Threaded` keyword. This tells the compiler to construct the final application in a manner that allows that system to be dispatched across multiple execution threads if needed. If we wanted to take our `integrate` system and make it threaded, we would simply change the first line to look like this.
 ```Pipelang
@@ -61,11 +62,11 @@ When defining a Callback, you define it similarly to a function, as such.
 Callback spawnParticles(idx: i32, read position, read particleSampler){...};
 ```
 Arguments here work a bit differently, you are really just letting the compiler know what handles on what objects it has because it most likely isn't iterating over every single entity. You can also pass arguments to it to target specific instances of things. Like in the above example, where we pass an index in to get the index of the position that we want to use the particleSampler with.
-Of course, if you can't actually "call back" to this, it's entirely useless. Enter, the `hook` keyword. This keyword is used in Systems and in Callbacks to tell the hardware that if this line is reached, that you need to swap the instructions in the cache to be the designated callback, which is done like so:
+Of course, if you can't actually "call back" to this, it's entirely useless. Enter, the `hook` keyword. This keyword is used in Systems and in Callbacks to tell the hardware that if this line is reached, that you need to swap the instructions in the cache to be the designated callback, which is done like so.
 ```PipeLang
 hook spawnParticles(conditionIndex);
 ```
-Note how only the condition index is passed and not anything else, as those exist as global lists and Instances in the program state that can be easily targeted.
+Note how only the condition index is passed and not anything else, as those exist as global lists and Instances in the program state that can be easily targeted. This is used instead of an `exit;` statement and the thread doesn't release it's task, but instead change it where it would release later in some Callback. This means that even at the end of a long or short Callback tree, it would `exit;` releasing the task from the thread.
 ### Pipelines
 At the very end of everything, you have to tell the compiler how you want it all to come together. This is where pipelines come in. They take all of the keywords thrown in, put a couple extra ones on the front and back for things like I/O, and then compile it. A pipeline is usually defined like this:
 ```PipeLang
