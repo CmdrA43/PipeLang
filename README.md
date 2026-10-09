@@ -88,6 +88,10 @@ Entrypoint<mouseInp>(edit MouseState){
 }
 ```
 This Entrypoint could hook into another Callback or something, but simply exits because the work is done. How these hook up to the hardware is automatically handled by the compiler.
+A final section on this, is generating Events. How in the world do you tell your GPU that you want to render a frame, or edit some data? You generate an Event that gets passed to the OS that then interfaces with the hardware. This is done with the Generate method of an Event, like so, where `Event` is your chosen event type.
+```PipeLang
+Event.Generate = { val1, val2, val3, ..., valn };
+```
 ### Pipelines
 At the very end of everything, you have to tell the compiler how you want it all to come together. This is where pipelines come in. They take all of the keywords thrown in, put a couple extra ones on the front and back for things like I/O, and then compile it. A pipeline is usually defined like this:
 ```PipeLang
