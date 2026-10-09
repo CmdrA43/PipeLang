@@ -330,14 +330,32 @@ class Parser{
             case TokenType::COMPONENT:
                 return "component";
                 break;
+            case TokenType::INSTANCE:
+                return "instance";
+                break;
+            case TokenType::EVENT:
+                return "event";
+                break;
+            case TokenType::CREATE:
+                return "create";
+                break;
+            case TokenType::GENERATE:
+                return "generate";
+                break;
             case TokenType::SYSTEM:
                 return "system";
                 break;
-            case TokenType::IO:
-                return "IO";
+            case TokenType::CALLBACK:
+                return "callback";
                 break;
-            case TokenType::THREADED:
-                return "threaded";
+            case TokenType::ENTRYPOINT:
+                return "entrypoint";
+                break;
+            case TokenType::EXIT:
+                return "exit";
+                break;
+            case TokenType::HOOK:
+                return "hook";
                 break;
             case TokenType::FUSE:
                 return "fuse";
@@ -373,6 +391,12 @@ class Parser{
                 break;
             case TokenType::RBRACKET:
                 return "]";
+                break;
+            case TokenType::LCARAT:
+                return "<";
+                break;
+            case TokenType::RCARAT:
+                return ">";
                 break;
                 
             case TokenType::COMMA:
