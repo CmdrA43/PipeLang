@@ -20,11 +20,6 @@ struct entityDeclarationNode{
     std::vector<std::string> components;
 };
 
-struct IODeclarationNode{
-    std::string name;
-    std::string type;
-};
-
 struct parameterNode{
     std::string privligeLevel;
     std::string name;
@@ -69,7 +64,6 @@ struct programNode{
     std::vector<componentDeclarationNode> components;
     std::vector<entityDeclarationNode> entities;
     std::vector<systemDeclarationNode> systems;
-    std::vector<IODeclarationNode> IOs;
     
     pipelineDeclarationNode pipe;
 };
@@ -134,7 +128,6 @@ class Parser{
             case TokenType::COMPONENT: program.components.push_back(parseComponent()); break;
             case TokenType::ENTITY: program.entities.push_back(parseEntity()); break;
             case TokenType::SYSTEM: program.systems.push_back(parseSystem()); break;
-            case TokenType::IO: program.IOs.push_back(parseIO()); break;
             default:
                 std::cerr << "Unexpected token " << tokenTypeName(peek().type) << " at start of declaration\n";
                 exit(1);
@@ -243,23 +236,6 @@ class Parser{
             std::cout << "  param: " << access << " " << compName.value << "\n";
         }
         return parameter;
-    };
-    
-    IODeclarationNode parseIO(){
-        IODeclarationNode interface;
-        expect(TokenType::IO, "IO identifier");
-        expect(TokenType::DOT, "dot accessor");
-        
-        Token name = expect(TokenType::IDENT, "interface name");
-        interface.name = name.value;
-        
-        expect(TokenType::COLON, "field type colon");
-        Token type = expect(TokenType::TYPE, "type");
-        interface.type = type.value;
-        
-        expect(TokenType::SEMICOLON, "after identifier");
-        
-        return interface;
     };
     
     systemDeclarationNode parseSystem() {
