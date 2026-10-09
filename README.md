@@ -67,6 +67,27 @@ Of course, if you can't actually "call back" to this, it's entirely useless. Ent
 hook spawnParticles(conditionIndex);
 ```
 Note how only the condition index is passed and not anything else, as those exist as global lists and Instances in the program state that can be easily targeted. This is used instead of an `exit;` statement and the thread doesn't release it's task, but instead change it where it would release later in some Callback. This means that even at the end of a long or short Callback tree, it would `exit;` releasing the task from the thread.
+### Entrypoints / Events
+Of course, no application can be used by someone unless you allow input. The `Event` keyword and `Entrypoint` sub-system allow for this to happen. You first define an Event signature like below.
+```PipeLang
+Event mouseInp{
+  type: i32 = SystemMouseEvent;
+  mouseX: f32;
+  mouseY: f32;
+};
+```
+This is a sort of layout, like a Component, where you have a set value that is read by the hardware and if the first part of the actual passed Event matches this, the rest of the data is parsed into the Event signature, and then an Entrypoint is injected into the avaliable task pool.
+An Entrypoint is a special type of Callback, one that acts as the point of entering a callback tree for a specific event type. It is defined like this, where `MouseState` is some Instance that contains the state of the mouse for the program.
+```PipeLang
+Entrypoint<mouseInp>(edit MouseState){
+  MouseState.old.x = MouseState.new.x;
+  MouseState.old.y = MouseState.new.y;
+  MouseState.new.x = mouseInp.mouseX;
+  MouseState.new.y = mouseInp.mouseY;
+  exit;
+}
+```
+This Entrypoint could hook into another Callback or something, but simply exits because the work is done. How these hook up to the hardware is automatically handled by the compiler.
 ### Pipelines
 At the very end of everything, you have to tell the compiler how you want it all to come together. This is where pipelines come in. They take all of the keywords thrown in, put a couple extra ones on the front and back for things like I/O, and then compile it. A pipeline is usually defined like this:
 ```PipeLang
