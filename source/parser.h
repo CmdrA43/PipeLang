@@ -28,7 +28,7 @@ struct instanceDeclarationNode{
 struct eventDeclarationNode{
     std::string name;
     std::string type;
-    std::vector<std::string> components;
+    std::vector<fieldNode> field;
 };
 
 struct parameterNode{
