@@ -62,7 +62,7 @@ Of course, if you can't actually "call back" to this, it's entirely useless. Ent
 ```PipeLang
 hook spawnParticles();
 ```
-Note how only the condition index is passed and not anything else, as those exist as global lists and Instances in the program state that can be easily targeted. This is used instead of an `exit;` statement and the thread doesn't release it's task, but instead change it where it would release later in some Callback. This means that even at the end of a long or short Callback tree, it would `exit;` releasing the task from the thread.
+Note how nothing is passed, as those exist as global lists and Instances in the program state that can be easily targeted. This is used instead of an `exit;` statement and the thread doesn't release it's task, but instead changes it where it would release later in some Callback. This means that even at the end of a long or short Callback tree, it would `exit;` releasing the task from the thread.
 ### Entrypoints / Events
 Of course, no application can be used by someone unless you allow input. The `Event` keyword and `Entrypoint` sub-system allow for this to happen. You first define an Event signature like below.
 ```PipeLang

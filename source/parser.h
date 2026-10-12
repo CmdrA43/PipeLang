@@ -48,7 +48,6 @@ struct callbackDeclarationNode{
 };
 
 struct entrypointDeclarationNode{
-    std::string name;
     std::string eventSignature;
     std::vector<parameterNode> parameters;
 };
@@ -156,7 +155,7 @@ class Parser{
             case TokenType::EVENT: program.events.push_back(parseEvent()); break;
 
             case TokenType::SYSTEM: program.systems.push_back(parseSystem()); break;
-            //case TokenType::CALLBACK: program.callbacks.push_back(parseCallback()); break;
+            case TokenType::CALLBACK: program.callbacks.push_back(parseCallback()); break;
             //case TokenType::ENTRYPOINT: program.entrypoints.push_back(parseEntrypoint()); break;
             default:
                 std::cerr << "Unexpected token " << tokenTypeName(peek().type) << " at start of declaration\n";
@@ -238,7 +237,7 @@ class Parser{
         expect(TokenType::INSTANCE, "instance");
 
         Token type = expect(TokenType::IDENT, "instance type");
-        instance.entityType = type;
+        instance.entityType = type.value;
 
         Token name = expect(TokenType::IDENT, "instance identifier");
         instance.name = name;
@@ -254,7 +253,7 @@ class Parser{
 
         expect(TokenType::LCARAT, "opening carat");
         Token eventType = expect(TokenType::IDENT, "event type");
-        event.eventType = type;
+        event.eventType = type.value;
         expect(TokenType::RCARAT, "closing carat");
 
         Token name = expect(TokenType::IDENT, "name");
@@ -262,7 +261,6 @@ class Parser{
 
         expect(TokenType::LBRACE, "opening brace");
 
-        // make a field parsing loop here
         while(!check(TokenType::RBRACE)){
             fieldNode field;
             Token fieldName = expect(TokenType::IDENT, "field name");
@@ -335,6 +333,62 @@ class Parser{
         }
         expect(TokenType::RBRACE, "body end");
         return System;
+    };
+
+    entrypointDeclarationNode parseEntrypoint(){
+        entrypointDeclarationNode entrypoint;
+
+        expect(TokenType::LCARAT, "opening carat");
+        Token eventSig = expect(TokenType::IDENT, "event signature handle");
+        entrpoint.eventSignature = eventSig.value;
+        expect(TokenType::RCARAT, "closing carat");
+
+        expect(TokenType::LPAREN, "entrypoint handles");
+        std::cout << "Entrypoint<" << eventSig.value << ">(\n";
+
+        if(!check(TokenType::RPAREN)){
+            entrypoint.parameters.push_back(parseParam());
+            while(check(TokenType::COMMA)){
+                advance();
+                entrypoint.parameters.push_back(parseParam());
+            }
+        }
+        expect(TokenType::RPAREN, "end of handles");
+        std::cout << "\n";
+
+        expect(TokenType::LBRACE, "entrypoint body");
+        while(!check(TokenType::RBRACE)){
+            advance();
+        }
+        expect(TokenType::RBRACE, "body end");
+        return entrypoint;
+    };
+
+    callbackDeclarationNode parseCallback(){
+        callbackDeclarationNode callback;
+
+        Token name = expect(TokenType::IDENT, "callback identifier");
+        callback.name = name.value;
+
+        expect(TokenType::LPAREN, "callback handles");
+        std::cout << "Callback " << name.value << "(\n";
+
+        if(!check(TokenType::RPAREN)){
+            callback.parameters.push_back(parseParam());
+            while(check(TokenType::COMMA)){
+                advance();
+                callback.parameters.push_back(parseParam());
+            }
+        }
+        expect(TokenType::RPAREN, "end of handles");
+        std::cout << "\n";
+
+        expect(TokenType::LBRACE, "callback body");
+        while(!check(TokenType::RBRACE)){
+            advance();
+        }
+        expect(TokenType::RBRACE, "body end");
+        return callback;
     };
     
     pipelineSequenceNode parsePipelineSequence(){
