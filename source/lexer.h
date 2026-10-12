@@ -29,6 +29,7 @@ enum class TokenType{
     READ_PRIV,
     WRITE_PRIV,
     EDIT_PRIV,
+
     // grouping symbols
     LPAREN,
     RPAREN,
@@ -38,28 +39,45 @@ enum class TokenType{
     RBRACKET,
     LCARAT,
     RCARAT,
+
     // delimiter symbols
     COMMA,
     SEMICOLON,
     COLON,
     DOT,
+
     // pipeline symbols
     RIGHT_ARROW,
     PIPE,
+
     // control flow
     IF,
     ELSE,
+
     // literals
     NUMBER,
     STRING,
-    // other
+
+    // comparison
     EQUALS,
-    PLUS,
-    MINUS,
-    STAR,
-    SLASH,
+    GTEQ,
+    LTEQ,
     AMPERSAND,
+
+    // data modification
+    EQUALS_SET,
+    PLUS,
+    INCREASE,
+    INCREMENT,
+    MINUS,
+    DECREASE,
+    DECREMENT,
+    STAR,
+    SCALE_UP,
+    SLASH,
+    SCALE_DOWN,
     LET,
+
     // special
     END_OF_FILE,
     IDENT,
@@ -123,14 +141,26 @@ class Lexer{
                 return Token{TokenType::RBRACKET, "]"};
                 break;
             case '<':
+                if(text[pos+1] == "="){
+                    std::cout << "Got less-than or equal-to token\n";
+                    pos+=2;
+                    return Token{TokenType::LTEQ, "<="};
+                    break;
+                }
                 std::cout << "Got left carat token\n";
                 pos++;
                 return Token{TokenType::LCARAT, "<"};
                 break;
             case '>':
+                if(text[pos+1] == "="){
+                    std::cout << "Got greater-than or equal-to token\n";
+                    pos+=2;
+                    return Token{TokenType::GTEQ, ">="};
+                    break;
+                }
                 if(text[pos+1] == '>'){
                     std::cout << "Got right arrow token\n";
-                    pos++;
+                    pos+=2;
                     return Token{TokenType::RIGHT_ARROW, ">>"};
                     break;
                 }
@@ -198,26 +228,68 @@ class Lexer{
             
             // arithmetic/logic
             case '=':
-                std::cout << "Got equals token\n";
+                if(text[pos+1] == '='){
+                    std::cout << "Got equals token\n";
+                    pos+=2;
+                    return Token{TokenType::EQUALS, "=="};
+                    break;
+                }
+                std::cout << "Got equals set token\n";
                 pos++;
-                return Token{TokenType::EQUALS, "="};
+                return Token{TokenType::EQUALS_SET, "="};
                 break;
             case '+':
+                if(text[pos+1] == "="){
+                    std::cout << "Got increase token\n";
+                    pos+=2;
+                    return Token{TokenType::INCREASE, "+="};
+                    break;
+                }
+                if(text[pos+1] == "+"){
+                    std::cout << "Got increment token\n";
+                    pos+=2;
+                    return Token{TokenType::INCREMENT, "++"};
+                    break;
+                }
                 std::cout << "Got plus token\n";
                 pos++;
                 return Token{TokenType::PLUS, "+"};
                 break;
             case '-':
+                if(text[pos+1] == "="){
+                    std::cout << "Got decrease token\n";
+                    pos+=2;
+                    return Token{TokenType::DECREASE, "-="};
+                    break;
+                }
+                if(text[pos+1] == "-"){
+                    std::cout << "Got decrement token\n";
+                    pos+=2;
+                    return Token{TokenType::DECREMENT, "--"};
+                    break;
+                }
                 std::cout << "Got minus token\n";
                 pos++;
                 return Token{TokenType::MINUS, "-"};
                 break;
             case '*':
+                if(text[pos+1] == "="){
+                    std::cout << "Got scale up token\n";
+                    pos+=2;
+                    return Token{TokenType::SCALE_UP, "*="};
+                    break;
+                }
                 std::cout << "Got star token\n";
                 pos++;
                 return Token{TokenType::STAR, "*"};
                 break;
             case '/':
+                if(text[pos+1] == "="){
+                    std::cout << "Got scale down token\n";
+                    pos+=2;
+                    return Token{TokenType::SCALE_UP, "/="};
+                    break;
+                }
                 std::cout << "Got slash token\n";
                 pos++;
                 return Token{TokenType::SLASH, "/"};
