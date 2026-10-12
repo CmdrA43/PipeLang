@@ -153,7 +153,7 @@ class Parser{
             case TokenType::COMPONENT: program.components.push_back(parseComponent()); break;
             case TokenType::ENTITY: program.entities.push_back(parseEntity()); break;
             case TokenType::INSTANCE: program.instances.push_back(parseInstance()); break;
-            //case TokenType::EVENT: program.events.push_back(parseEvent()); break;
+            case TokenType::EVENT: program.events.push_back(parseEvent()); break;
 
             case TokenType::SYSTEM: program.systems.push_back(parseSystem()); break;
             //case TokenType::CALLBACK: program.callbacks.push_back(parseCallback()); break;
@@ -280,7 +280,7 @@ class Parser{
 
         expect(TokenType::RBRACE, "end of event");
         expect(TokenType::SEMICOLON, "after event");
-        return component;
+        return event;
     };
     
     parameterNode parseParam(){
