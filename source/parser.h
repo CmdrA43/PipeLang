@@ -240,7 +240,7 @@ class Parser{
         instance.entityType = type.value;
 
         Token name = expect(TokenType::IDENT, "instance identifier");
-        instance.name = name;
+        instance.name = name.value;
 
         expect(TokenType::SEMICOLON, "after instance");
         return instance;
@@ -253,11 +253,11 @@ class Parser{
 
         expect(TokenType::LCARAT, "opening carat");
         Token eventType = expect(TokenType::IDENT, "event type");
-        event.eventType = type.value;
+        event.eventType = eventType.value;
         expect(TokenType::RCARAT, "closing carat");
 
         Token name = expect(TokenType::IDENT, "name");
-        event.name = name;
+        event.name = name.value;
 
         expect(TokenType::LBRACE, "opening brace");
 

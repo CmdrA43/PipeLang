@@ -128,6 +128,12 @@ class Lexer{
                 return Token{TokenType::LCARAT, "<"};
                 break;
             case '>':
+                if(text[pos+1] == '>'){
+                    std::cout << "Got right arrow token\n";
+                    pos++;
+                    return Token{TokenType::RIGHT_ARROW, ">>"};
+                    break;
+                }
                 std::cout << "Got right carat token\n";
                 pos++;
                 return Token{TokenType::RCARAT, ">"};
@@ -156,13 +162,6 @@ class Lexer{
                 break;
 
             // pipe specials
-            case '>':
-                if(text[pos+1] == '>'){
-                    std::cout << "Got right arrow token\n";
-                    pos += 2;
-                    return Token{TokenType::RIGHT_ARROW, ">>"};
-                }
-                break;
             case '|':
                 std::cout << "Got pipe token\n";
                 pos++;
