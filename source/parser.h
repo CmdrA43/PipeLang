@@ -156,7 +156,7 @@ class Parser{
 
             case TokenType::SYSTEM: program.systems.push_back(parseSystem()); break;
             case TokenType::CALLBACK: program.callbacks.push_back(parseCallback()); break;
-            //case TokenType::ENTRYPOINT: program.entrypoints.push_back(parseEntrypoint()); break;
+            case TokenType::ENTRYPOINT: program.entrypoints.push_back(parseEntrypoint()); break;
             default:
                 std::cerr << "Unexpected token " << tokenTypeName(peek().type) << " at start of declaration\n";
                 exit(1);
@@ -203,7 +203,7 @@ class Parser{
         Token name = expect(TokenType::IDENT, "component name");
         entity.name = name.value;
         
-        expect(TokenType::EQUALS, "entity equals");
+        expect(TokenType::EQUALS_SET, "entity equals");
         expect(TokenType::LBRACE, "entity component list");
         
         std::cout << "Entity: " << name.value << " = { ";
