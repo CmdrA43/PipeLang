@@ -263,6 +263,24 @@ class Parser{
         expect(TokenType::LBRACE, "opening brace");
 
         // make a field parsing loop here
+        while(!check(TokenType::RBRACE)){
+            fieldNode field;
+            Token fieldName = expect(TokenType::IDENT, "field name");
+            field.name = fieldName.value;
+            
+            expect(TokenType::COLON, "field type colon");
+            Token fieldType = expect(TokenType::TYPE, "field type");
+            field.type = fieldType.value;
+            
+            expect(TokenType::SEMICOLON, "after field");
+            std::cout << "  field " << fieldName.value << " : " << fieldType.value << "\n";
+            
+            event.field.push_back(field);
+        };
+
+        expect(TokenType::RBRACE, "end of event");
+        expect(TokenType::SEMICOLON, "after event");
+        return component;
     };
     
     parameterNode parseParam(){
