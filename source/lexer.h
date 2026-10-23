@@ -59,6 +59,8 @@ enum class TokenType{
     STRING,
 
     // comparison
+    EXCLAMATION,
+    NOT_EQUALS,
     EQUALS,
     GTEQ,
     LTEQ,
@@ -227,6 +229,16 @@ class Lexer{
                 break;
             
             // arithmetic/logic
+            case '!':
+                if(text[pos+1] == '='){
+                    std::cout << "Got not equals token\n";
+                    pos+=2;
+                    return Token{TokenType::NOT_EQUALS, "!="};
+                }
+                std::cout << "Got exclamation token\n";
+                pos++;
+                return Token{TokenType::EXCLAMATION, "!"};
+                break;
             case '=':
                 if(text[pos+1] == '='){
                     std::cout << "Got equals token\n";

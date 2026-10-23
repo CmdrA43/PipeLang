@@ -4,6 +4,32 @@
 
 // --- PARSER ---
 
+//expressions
+struct exprNode{
+    virtual ~exprNode() = default;
+};
+
+struct literalNode : exprNode{
+    std::string value;
+    TokenType type;
+};
+
+struct operatorNode : exprNode{
+    TokenType type;
+    std::unique_ptr<exprNode> left;
+    std::unique_ptr<exprNode> right;
+};
+
+struct prefixNode : exprNode{
+    TokenType type;
+    std::unique_ptr<exprNode> right;
+};
+
+struct postfixNode : exprNode{
+    TokenType type;
+    std::unique_ptr<exprNode> left;
+};
+
 //declaration nodes
 struct fieldNode{
     std::string name;
@@ -39,17 +65,19 @@ struct parameterNode{
 struct systemDeclarationNode{
     std::string name;
     std::vector<parameterNode> parameters;
-    // make reference to expressions and statements eventually for actual execution block
+    std::vector<exprNode> expressions;
 };
 
 struct callbackDeclarationNode{
     std::string name;
     std::vector<parameterNode> parameters;
+    std::vector<exprNode> expressions;
 };
 
 struct entrypointDeclarationNode{
     std::string eventSignature;
     std::vector<parameterNode> parameters;
+    std::vector<exprNode> expressions;
 };
 
 // pipeline nodes for parsing/enum for stage types
@@ -307,6 +335,39 @@ class Parser{
 
         return parameter;
     };
+
+    std::unique_ptr<exprNode> nullDetonation(const Token& token){
+        if(token.type == TokenType::NUMBER || token.type == TokenType::STRING){
+            auto node = std::make_unique<literalNode>();
+            node->value = token.value;
+            node->type = token.type;
+            return node;
+        }
+        if(token.type == TokenType::IDENT){
+            auto node = std::make_unique<literalNode>();
+            node->value = token.value;
+            if(check(TokenType::DOT)){
+                node->value += ".";
+                Token member = expect(TokenType::IDENT, "member");
+                node->value += member.value;
+            }
+            node->type = token.type;
+            return node;
+        }
+        if(token.type == TokenType::INCREMENT || token.type == TokenType::DECREMENT){
+            auto node = std::make_unique<postfixNode>();
+            node->value = token.value;
+            node->type = token.type;
+            return node;
+        }
+
+    };
+
+    exprNode parseExpression(int currentPrecedence = 0){
+        exprNode exprRoot;
+
+
+    };
     
     systemDeclarationNode parseSystem() {
         systemDeclarationNode System;
@@ -554,20 +615,47 @@ class Parser{
                 return "string";
                 break;
                 
+            case TokenType::EXCLAMATION:
+                return "!";
+                break;
+            case TokenType::NOT_EQUALS:
+                return "!=";
+                break;
             case TokenType::EQUALS:
+                return "==";
+                break;
+            case TokenType::EQUALS_SET:
                 return "=";
                 break;
             case TokenType::PLUS:
                 return "+";
                 break;
+            case TokenType::INCREMENT:
+                return "++";
+                break;
+            case TokenType::INCREASE:
+                return "+=";
+                break;
             case TokenType::MINUS:
                 return "-";
+                break;
+            case TokenType::DECREMENT:
+                return "--";
+                break;
+            case TokenType::DECREASE:
+                return "-=";
                 break;
             case TokenType::STAR:
                 return "*";
                 break;
+            case TokenType::SCALE_UP:
+                return "*=";
+                break;
             case TokenType::SLASH:
                 return "/";
+                break;
+            case TokenType::SCALE_DOWN:
+                return "/=";
                 break;
             case TokenType::AMPERSAND:
                 return "&";
