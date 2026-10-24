@@ -336,7 +336,7 @@ class Parser{
         return parameter;
     };
 
-    std::unique_ptr<exprNode> nullDetonation(const Token& token){
+    std::unique_ptr<exprNode> nullDenotation(const Token& token){
         if(token.type == TokenType::NUMBER || token.type == TokenType::STRING){
             auto node = std::make_unique<literalNode>();
             node->value = token.value;
